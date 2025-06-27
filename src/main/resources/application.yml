@@ -2,8 +2,12 @@ server:
   port: ${PORT:8088}      # Prend la variable d'env PORT ou 8088 par défaut
 
 spring:
+  cloud:
+    config:
+      enabled=false:
   config:
     import: optional:configserver:http://localhost:8888
+
   application:
     name: pedagogie-service
   datasource:
