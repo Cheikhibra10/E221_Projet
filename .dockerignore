@@ -1,0 +1,10 @@
+.git
+.gitignore
+target/
+.idea
+*.iml
+*.log
+.env
+README.md
+Dockerfile
+docker-compose.yml
