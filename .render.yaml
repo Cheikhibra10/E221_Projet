@@ -1,8 +1,5 @@
 services:
   - type: web
     name: pedagogie-service
-    env: java
+    env: docker
     plan: free
-    rootDir: pedagogie-service
-    buildCommand: ./mvnw clean install
-    startCommand: java -Dserver.port=$PORT $JAVA_OPTS -jar target/pedagogie-service.jar
