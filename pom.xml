@@ -13,20 +13,6 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>pedagogie-service</name>
 	<description>Demo project for Spring Boot</description>
-	<repositories>
-		<repository>
-			<id>github</id>
-			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/ecole221dev/commun</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<url/>
 	<licenses>
 		<license/>
 	</licenses>

@@ -1,5 +1,6 @@
 server:
-  port: 8088
+  port: ${PORT:8088}      # Prend la variable d'env PORT ou 8088 par défaut
+
 spring:
   config:
     import: optional:configserver:http://localhost:8888
@@ -7,9 +8,9 @@ spring:
     name: pedagogie-service
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/pedagogie
-    username: postgres
-    password: Mbectemi
+    url: ${SPRING_DATASOURCE_URL}           # Variable d'env pour la connexion DB
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
