@@ -1,20 +1,27 @@
-# Start from OpenJDK image
 FROM eclipse-temurin:21-jdk
 
-# Set working directory
 WORKDIR /app
 
-# Copy everything
 COPY . .
 
-# Make mvnw executable
+# Crée le dossier Maven config
+RUN mkdir -p /root/.m2
+
+# Génère le settings.xml avec le token GitHub depuis la variable d'environnement
+RUN echo '<settings>
+  <servers>
+    <server>
+      <id>github</id>
+      <username>Cheikhibra10</username>
+      <password>'"${GITHUB_TOKEN}"'</password>
+    </server>
+  </servers>
+</settings>' > /root/.m2/settings.xml
+
 RUN chmod +x mvnw
 
-# Build the app
 RUN ./mvnw clean install -DskipTests
 
-# Expose the port
 EXPOSE 8080
 
-# Run the app
 CMD ["java", "-jar", "target/pedagogie-service.jar"]
