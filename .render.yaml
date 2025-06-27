@@ -3,5 +3,6 @@ services:
     name: pedagogie-service
     env: java
     plan: free
-    buildCommand: mvn clean install
+    rootDir: pedagogie-service
+    buildCommand: ./mvnw clean install
     startCommand: java -Dserver.port=$PORT $JAVA_OPTS -jar target/pedagogie-service.jar
