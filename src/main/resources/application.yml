@@ -1,0 +1,17 @@
+server:
+  port: 8088
+spring:
+  config:
+    import: optional:configserver:http://localhost:8888
+  application:
+    name: pedagogie-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/pedagogie
+    username: postgres
+    password: Mbectemi
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
