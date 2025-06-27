@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8088}      # Prend la variable d'env PORT ou 8088 par défaut
+  port: ${PORT:8088}
 
 spring:
   cloud:
@@ -12,7 +12,7 @@ spring:
     name: pedagogie-service
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}           # Variable d'env pour la connexion DB
+    url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
