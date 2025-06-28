@@ -1,0 +1,47 @@
+name: 🚀 Build pedagogie-service avec dernière version de commun
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout pedagogie-service
+        uses: actions/checkout@v4
+
+      - name: Récupérer la dernière version taguée de commun
+        id: get-tag
+        run: |
+          latest=$(curl -s https://api.github.com/repos/Cheikhibra10/commun/tags | jq -r '.[0].name')
+          echo "COMMUN_TAG=${latest}" >> $GITHUB_ENV
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Rendre mvnw exécutable
+        run: chmod +x mvnw
+
+      - name: Créer settings.xml avec accès GitHub Packages
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      - name: Build avec la bonne version de commun
+        run: ./mvnw clean install -Dcommun.version=${COMMUN_TAG#v} -DskipTests
