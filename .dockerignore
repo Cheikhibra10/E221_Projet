@@ -6,5 +6,5 @@ target/
 *.log
 .env
 README.md
-Dockerfile
+../Dockerfile
 docker-compose.yml
