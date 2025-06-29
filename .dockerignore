@@ -4,7 +4,7 @@ target/
 .idea
 *.iml
 *.log
-.env
+../.env
 README.md
 ../Dockerfile
 docker-compose.yml
