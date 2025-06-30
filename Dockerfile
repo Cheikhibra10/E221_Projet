@@ -1,33 +1,28 @@
-# Étape 1 : Build avec Maven Wrapper et JDK 21
 FROM eclipse-temurin:21-jdk AS builder
 
-# Définir le répertoire de travail
+# Inject token comme ARG pour le passer à Maven
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+
 WORKDIR /app
 
-# Copier les fichiers Maven nécessaires pour profiter du cache
+# Copier les fichiers Maven
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 
-# Télécharger les dépendances (cache utile si aucun changement dans les deps)
+# 🟡 Copier le settings.xml personnalisé dans /root/.m2/
+COPY maven/settings.xml /root/.m2/settings.xml
+
+# Téléchargement des dépendances
 RUN ./mvnw dependency:go-offline
 
-# Copier tout le projet
+# Puis on copie tout le reste du projet
 COPY . .
 
-# Compiler et packager l'application (skip tests pour build rapide)
 RUN ./mvnw clean package -DskipTests
 
-# Étape 2 : Image finale pour exécution
 FROM eclipse-temurin:21-jre
-
-# Répertoire de l'application dans le conteneur
 WORKDIR /app
-
-# Copier le JAR depuis l'étape précédente
 COPY --from=builder /app/target/*.jar app.jar
-
-# Exposer le port utilisé par Spring Boot
 EXPOSE 8080
-
-# Commande pour lancer l'application
 ENTRYPOINT ["java", "-jar", "app.jar"]
