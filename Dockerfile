@@ -5,25 +5,21 @@ ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 
 WORKDIR /app
 
-# Copier uniquement le code du service
+# Copier uniquement le code de pedagogie-service
 COPY . .
 
-# Ajouter les settings Maven GitHub
+# Settings Maven pour GitHub
 RUN mkdir -p /root/.m2
 COPY maven/settings.xml /root/.m2/settings.xml
 RUN sed -i "s|\${env.GITHUB_TOKEN}|${GITHUB_TOKEN}|" /root/.m2/settings.xml
 
 RUN chmod +x ./mvnw
 
-# Build sans tests
-RUN ./mvnw clean install -DskipTests \
-    -Dmaven.wagon.http.retryHandler.count=5 \
-    -Dhttp.connection.timeout=60000 \
-    -Dhttp.read.timeout=60000
+# Build avec accès à GitHub Packages
+RUN ./mvnw clean install -DskipTests
 
 # Image finale
 FROM eclipse-temurin:21-jdk
-
 WORKDIR /app
 COPY --from=builder /app/target/pedagogie-service.jar app.jar
 
