@@ -3,8 +3,7 @@ services:
     name: pedagogie-service
     env: docker
     plan: free
-    dockerfilePath: pedagogie-service/Dockerfile
-    dockerContext: pedagogie-service
-    envVars:
-      - key: GITHUB_TOKEN
-        sync: false
+    region: frankfurt
+    branch: master
+    dockerContext: .
+    dockerfilePath: Dockerfile
