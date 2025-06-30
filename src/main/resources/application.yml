@@ -1,5 +1,6 @@
 server:
   port: ${PORT:8080} # PORT injecté par Render
+  forward-headers-strategy: framework
 
 springdoc:
   api-docs:
@@ -8,10 +9,10 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
-cors:
-  allowed-origins: "https://e221-projet.onrender.com"
-  allowed-methods: "*"
-  allowed-headers: "*"
+    url: /v3/api-docs
+    operations-sorter: method
+    disable-swagger-default-url: true
+
 spring:
   cloud:
     config:
