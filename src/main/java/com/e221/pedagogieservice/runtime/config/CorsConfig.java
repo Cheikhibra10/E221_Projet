@@ -2,12 +2,11 @@ package com.e221.pedagogieservice.runtime.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.List;
+import java.util.Arrays;
 
 @Configuration
 public class CorsConfig {
@@ -15,27 +14,22 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true); // Autoriser les cookies et headers d'authentification
 
-        // ✅ Origine autorisée (Render)
-        config.setAllowedOrigins(List.of("https://e221-projet.onrender.com"));
-
-        // ✅ Headers autorisés
-        config.setAllowedHeaders(List.of(
-                HttpHeaders.ORIGIN,
-                HttpHeaders.CONTENT_TYPE,
-                HttpHeaders.ACCEPT,
-                HttpHeaders.AUTHORIZATION
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(Arrays.asList(
+                "https://e221-projet.onrender.com", // 🟢 Domaine Render
+                "http://localhost:8080"            // 🧪 Swagger local
         ));
-
-        // ✅ Méthodes autorisées
-        config.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        config.setAllowedHeaders(Arrays.asList(
+                "*"
         ));
+        config.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
+        config.setMaxAge(3600L); // Cache CORS 1h
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
         return new CorsFilter(source);
     }
 }
