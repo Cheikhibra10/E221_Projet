@@ -1,6 +1,17 @@
 server:
   port: ${PORT:8080} # PORT injecté par Render
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+cors:
+  allowed-origins: "https://e221-projet.onrender.com"
+  allowed-methods: "*"
+  allowed-headers: "*"
 spring:
   cloud:
     config:

@@ -27,11 +27,11 @@ import org.springframework.context.annotation.Configuration;
         servers = {
                 @Server(
                         description = "Local ENV",
-                        url = "http://localhost:8088"
+                        url = "http://localhost:8085"
                 ),
                 @Server(
                         description = "PROD ENV",
-                        url = "https://aliboucoding.com/course"
+                        url = "https://e221-projet.onrender.com"
                 )
         }
 )
