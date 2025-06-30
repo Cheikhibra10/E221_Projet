@@ -1,35 +1,33 @@
-# Étape 1 : Build de l’application avec Maven
+# Étape 1 : Build avec Maven Wrapper et JDK 21
 FROM eclipse-temurin:21-jdk AS builder
 
-# Argument pour GitHub Token
-ARG GITHUB_TOKEN
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
-
-# Dossier de travail
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier le code source
+# Copier les fichiers Maven nécessaires pour profiter du cache
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+
+# Télécharger les dépendances (cache utile si aucun changement dans les deps)
+RUN ./mvnw dependency:go-offline
+
+# Copier tout le projet
 COPY . .
 
-# Configurer Maven pour GitHub Packages
-RUN mkdir -p /root/.m2
-COPY maven/settings.xml /root/.m2/settings.xml
-RUN sed -i "s|\${env.GITHUB_TOKEN}|${GITHUB_TOKEN}|" /root/.m2/settings.xml
+# Compiler et packager l'application (skip tests pour build rapide)
+RUN ./mvnw clean package -DskipTests
 
-# Rendre le wrapper exécutable
-RUN chmod +x ./mvnw
+# Étape 2 : Image finale pour exécution
+FROM eclipse-temurin:21-jre
 
-# Build du projet sans tests
-RUN ./mvnw clean install -DskipTests \
-    -Dmaven.wagon.http.retryHandler.count=5 \
-    -Dhttp.connection.timeout=60000 \
-    -Dhttp.read.timeout=60000
-
-# Étape 2 : Image finale minimale
-FROM eclipse-temurin:21-jdk
-
+# Répertoire de l'application dans le conteneur
 WORKDIR /app
-COPY --from=builder /app/target/pedagogie-service.jar app.jar
 
-EXPOSE 8085
+# Copier le JAR depuis l'étape précédente
+COPY --from=builder /app/target/*.jar app.jar
+
+# Exposer le port utilisé par Spring Boot
+EXPOSE 8080
+
+# Commande pour lancer l'application
 ENTRYPOINT ["java", "-jar", "app.jar"]
