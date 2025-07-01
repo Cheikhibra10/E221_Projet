@@ -4,36 +4,26 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
-import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
 @OpenAPIDefinition(
         info = @Info(
                 title = "OpenApi specification - Cheikh",
                 version = "1.0",
-                description = "OpenApi documentation for Spring Boot app",
+                description = "Documentation OpenAPI pour le projet Spring Boot de pédagogie.",
                 contact = @Contact(
                         name = "Cheikh",
                         email = "contact@cheikhcoding.com",
                         url = "https://cheikhcoding.com/course"
                 ),
                 license = @License(
-                        name = "Licence name",
+                        name = "Licence libre",
                         url = "https://some-url.com"
                 ),
-                termsOfService = "Terms of service"
-        ),
-        servers = {
-                @Server(
-                        description = "Local ENV",
-                        url = "http://localhost:8085"
-                ),
-                @Server(
-                        description = "PROD ENV",
-                        url = "https://e221-projet.onrender.com"
-                )
-        }
+                termsOfService = "https://cheikhcoding.com/terms"
+        )
+        // ❌ Retiré les @Server pour éviter les erreurs CORS
 )
+@Configuration
 public class OpenApiConfig {
 }
