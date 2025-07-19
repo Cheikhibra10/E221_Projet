@@ -11,5 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface NiveauSpecialiteRepository extends JpaRepository<NiveauSpecialite, Long> {
+    Optional<NiveauSpecialite> findByNiveauAndSpecialiteAndArchiveFalse(Niveau niveau, Specialite specialite);
 
 }

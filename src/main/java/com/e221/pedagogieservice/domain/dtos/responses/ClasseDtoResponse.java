@@ -1,5 +1,6 @@
 package com.e221.pedagogieservice.domain.dtos.responses;
 
+import com.e221.pedagogieservice.domain.models.Statut;
 import lombok.*;
 
 @NoArgsConstructor
@@ -10,9 +11,10 @@ import lombok.*;
 public class ClasseDtoResponse {
     private Long id;
     private String libelle;
-    private boolean etat;
+    private String code;
+    private Statut statut;
     private boolean archive;
-    private HoraireDtoResponse horaire;
+    private DomaineDtoResponse domaine;
     private NiveauDtoResponse niveau;
     private SpecialiteDtoResponse specialite;
 }

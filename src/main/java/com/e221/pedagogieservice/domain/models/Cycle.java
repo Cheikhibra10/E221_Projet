@@ -13,7 +13,10 @@ public class Cycle implements GenericEntity<Cycle> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String cycle;
-    private boolean etat;
+    private String duree;
+    private int taux_horaire;
+    @Enumerated(EnumType.STRING)
+    private Statut statut;
     @Column(columnDefinition = "boolean default false")
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;

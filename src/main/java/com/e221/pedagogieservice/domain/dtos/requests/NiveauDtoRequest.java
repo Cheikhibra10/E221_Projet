@@ -1,5 +1,7 @@
 package com.e221.pedagogieservice.domain.dtos.requests;
 
+import com.e221.pedagogieservice.domain.models.Statut;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @NoArgsConstructor
@@ -8,11 +10,15 @@ import lombok.*;
 @Setter
 @Builder
 public class NiveauDtoRequest {
+
     private Long id;
+
+    @NotBlank(message = "Le libellé du niveau est obligatoire.")
+    @Size(min = 2, max = 50, message = "Le libellé doit contenir entre 2 et 50 caractères.")
     private String libelle;
-    private Integer niveau;
-    private Boolean etat;
+    private Statut statut;
     private Boolean archive;
+
+    @NotNull(message = "Le cycle est obligatoire.")
     private CycleDtoRequest cycle;
-    private ParcoursDtoRequest parcours;
 }

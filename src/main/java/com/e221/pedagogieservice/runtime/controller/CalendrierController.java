@@ -1,25 +1,14 @@
 package com.e221.pedagogieservice.runtime.controller;
 
 import com.cheikh.commun.config.AuditableUtil;
-import com.cheikh.commun.core.GenericCrudController;
+import com.cheikh.commun.core.PageResponse;
 import com.cheikh.commun.logging.Auditable;
 import com.e221.pedagogieservice.domain.annotation.apiversionning.E221ApiVersion;
 import com.e221.pedagogieservice.domain.dtos.requests.CalendrierDtoRequest;
-import com.e221.pedagogieservice.domain.dtos.requests.EvenementDtoRequest;
-import com.e221.pedagogieservice.domain.dtos.requests.MentionDtoRequest;
-import com.e221.pedagogieservice.domain.dtos.requests.OuvertureDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.responses.CalendrierDtoResponse;
-import com.e221.pedagogieservice.domain.dtos.responses.EvenementDtoResponse;
-import com.e221.pedagogieservice.domain.dtos.responses.MentionDtoResponse;
-import com.e221.pedagogieservice.domain.dtos.responses.OuvertureDtoResponse;
+import com.e221.pedagogieservice.domain.dtos.responses.SousClasseDtoResponse;
 import com.e221.pedagogieservice.domain.models.Calendrier;
-import com.e221.pedagogieservice.domain.models.Evenement;
-import com.e221.pedagogieservice.domain.models.Mention;
-import com.e221.pedagogieservice.domain.models.Ouverture;
-import com.e221.pedagogieservice.domain.services.CalendrierService;
-import com.e221.pedagogieservice.domain.services.EvenementService;
 import com.e221.pedagogieservice.runtime.services.CalendrierServiceImp;
-import com.e221.pedagogieservice.runtime.services.OuvertureServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @E221ApiVersion
@@ -65,7 +54,7 @@ public class CalendrierController{
     })
     @Auditable(value = "#{T(this).audit('update')}")
     @PutMapping("/{id}")
-    public ResponseEntity<CalendrierDtoResponse> update(@PathVariable Long id, @Valid @RequestBody CalendrierDtoRequest dto) {
+    public ResponseEntity<CalendrierDtoResponse> update(@PathVariable Long id, @RequestBody CalendrierDtoRequest dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -74,8 +63,11 @@ public class CalendrierController{
     })
     @Auditable(value = "#{T(this).audit('get_all')}")
     @GetMapping
-    public ResponseEntity<List<CalendrierDtoResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<CalendrierDtoResponse>> findAll(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page,size));
     }
 
     @Operation(summary = "Obtenir une entity par ID", responses = {
@@ -96,5 +88,21 @@ public class CalendrierController{
     @DeleteMapping("/{id}")
     public ResponseEntity<CalendrierDtoResponse> delete(@PathVariable Long id) {
         return ResponseEntity.ok(service.delete(id));
+    }
+
+    @Auditable(value = "#{T(this).audit('restore')}")
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<CalendrierDtoResponse> restore(@PathVariable Long id) {
+        return ResponseEntity.ok(service.restore(id));
+    }
+
+    @Operation(summary = "Mettre à jour partiellement une entité", responses = {
+            @ApiResponse(responseCode = "200", description = "Mise à jour partielle avec succès"),
+            @ApiResponse(responseCode = "404", description = "Entité non trouvée")
+    })
+    @Auditable(value = "#{T(this).audit('patch')}")
+    @PatchMapping("/{id}")
+    public ResponseEntity<CalendrierDtoResponse> patch(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
+        return ResponseEntity.ok(service.patchFields(id, fields));
     }
 }

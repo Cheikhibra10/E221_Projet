@@ -1,10 +1,12 @@
 package com.e221.pedagogieservice.runtime.controller;
 
 import com.cheikh.commun.config.AuditableUtil;
+import com.cheikh.commun.core.PageResponse;
 import com.cheikh.commun.logging.Auditable;
 import com.e221.pedagogieservice.domain.annotation.apiversionning.E221ApiVersion;
 import com.e221.pedagogieservice.domain.dtos.requests.MentionDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.responses.MentionDtoResponse;
+import com.e221.pedagogieservice.domain.dtos.responses.SousClasseDtoResponse;
 import com.e221.pedagogieservice.domain.models.Mention;
 import com.e221.pedagogieservice.runtime.services.MentionServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @E221ApiVersion
@@ -50,7 +53,7 @@ private final MentionServiceImp  service;
     })
     @Auditable(value = "#{T(this).audit('update')}")
     @PutMapping("/{id}")
-    public ResponseEntity<MentionDtoResponse> update(@PathVariable Long id, @Valid @RequestBody MentionDtoRequest dto) {
+    public ResponseEntity<MentionDtoResponse> update(@PathVariable Long id, @RequestBody MentionDtoRequest dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -59,8 +62,11 @@ private final MentionServiceImp  service;
     })
     @Auditable(value = "#{T(this).audit('get_all')}")
     @GetMapping
-    public ResponseEntity<List<MentionDtoResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<MentionDtoResponse>> findAll(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page, size));
     }
 
     @Operation(summary = "Obtenir une mention par ID", responses = {
@@ -81,6 +87,21 @@ private final MentionServiceImp  service;
     @DeleteMapping("/{id}")
     public ResponseEntity<MentionDtoResponse> delete(@PathVariable Long id) {
         return ResponseEntity.ok(service.delete(id));
+    }
+    @Auditable(value = "#{T(this).audit('restore')}")
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<MentionDtoResponse> restore(@PathVariable Long id) {
+        return ResponseEntity.ok(service.restore(id));
+    }
+
+    @Operation(summary = "Mettre à jour partiellement une entité", responses = {
+            @ApiResponse(responseCode = "200", description = "Mise à jour partielle avec succès"),
+            @ApiResponse(responseCode = "404", description = "Entité non trouvée")
+    })
+    @Auditable(value = "#{T(this).audit('patch')}")
+    @PatchMapping("/{id}")
+    public ResponseEntity<MentionDtoResponse> patch(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
+        return ResponseEntity.ok(service.patchFields(id, fields));
     }
 }
 

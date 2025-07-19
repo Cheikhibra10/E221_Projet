@@ -1,5 +1,7 @@
 package com.e221.pedagogieservice.domain.dtos.responses;
 
+import com.e221.pedagogieservice.domain.dtos.requests.NiveauDtoRequest;
+import com.e221.pedagogieservice.domain.models.Statut;
 import lombok.*;
 
 @NoArgsConstructor
@@ -10,7 +12,8 @@ import lombok.*;
 public class SemestreDtoResponse {
     private Long id;
     private String libelle;
-    private int numero;
-    private boolean etat;
-    private boolean archive;
+    private String duree;
+    private Statut statut;
+    private Boolean archive;
+    private NiveauDtoResponse niveau;
 }

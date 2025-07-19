@@ -1,5 +1,8 @@
 package com.e221.pedagogieservice.domain.dtos.requests;
 
+import com.e221.pedagogieservice.domain.models.Niveau;
+import com.e221.pedagogieservice.domain.models.Statut;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @NoArgsConstructor
@@ -8,9 +11,15 @@ import lombok.*;
 @Setter
 @Builder
 public class SemestreDtoRequest {
+
     private Long id;
+
+    @NotBlank(message = "Le libellé du semestre est obligatoire.")
+    @Size(min = 2, max = 100, message = "Le libellé doit contenir entre 2 et 100 caractères.")
     private String libelle;
-    private Integer numero;
-    private Boolean etat;
+    private String duree;
+    private Statut statut;
     private Boolean archive;
+    private NiveauDtoRequest niveau;
+
 }

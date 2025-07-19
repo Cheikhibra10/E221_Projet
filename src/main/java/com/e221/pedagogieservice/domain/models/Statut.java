@@ -1,7 +1,13 @@
 package com.e221.pedagogieservice.domain.models;
 
 public enum Statut {
-    Encours,
+    En_Cours,
     Terminer,
-    Avenir
+    Avenir,
+    Cloturer,
+    Actif,
+    Inactif,
+    Indisponible,
+    Disponible,
+    En_attente
 }

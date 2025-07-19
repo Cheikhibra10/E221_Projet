@@ -1,6 +1,7 @@
 package com.e221.pedagogieservice.domain.models;
 
 import com.cheikh.commun.core.GenericEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,6 +27,7 @@ public class EvenementCalendrier implements GenericEntity<EvenementCalendrier> {
     private boolean archive;
     @ManyToOne
     @JoinColumn(name = "calendrier_id", referencedColumnName = "id")
+    @JsonIgnore
     private Calendrier calendrier;
     @ManyToOne
     @JoinColumn(name = "evenement_id", referencedColumnName = "id")

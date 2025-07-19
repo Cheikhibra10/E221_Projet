@@ -1,10 +1,13 @@
 package com.e221.pedagogieservice.runtime.controller;
 
 import com.cheikh.commun.config.AuditableUtil;
+import com.cheikh.commun.core.PageResponse;
 import com.cheikh.commun.logging.Auditable;
 import com.e221.pedagogieservice.domain.annotation.apiversionning.E221ApiVersion;
 import com.e221.pedagogieservice.domain.dtos.requests.SpecialiteDtoRequest;
+import com.e221.pedagogieservice.domain.dtos.responses.SousClasseDtoResponse;
 import com.e221.pedagogieservice.domain.dtos.responses.SpecialiteDtoResponse;
+import com.e221.pedagogieservice.domain.dtos.responses.UeDtoResponse;
 import com.e221.pedagogieservice.domain.models.Specialite;
 import com.e221.pedagogieservice.runtime.services.SpecialiteServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @E221ApiVersion
@@ -51,7 +55,7 @@ public class SpecialiteController {
     })
     @Auditable(value = "#{T(this).audit('update')}")
     @PutMapping("/{id}")
-    public ResponseEntity<SpecialiteDtoResponse> update(@PathVariable Long id, @Valid @RequestBody SpecialiteDtoRequest dto) {
+    public ResponseEntity<SpecialiteDtoResponse> update(@PathVariable Long id,@RequestBody SpecialiteDtoRequest dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -60,8 +64,11 @@ public class SpecialiteController {
     })
     @Auditable(value = "#{T(this).audit('get_all')}")
     @GetMapping
-    public ResponseEntity<List<SpecialiteDtoResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<SpecialiteDtoResponse>> findAll(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page,size));
     }
 
     @Operation(summary = "Obtenir une entity par ID", responses = {
@@ -82,6 +89,20 @@ public class SpecialiteController {
     @DeleteMapping("/{id}")
     public ResponseEntity<SpecialiteDtoResponse> delete(@PathVariable Long id) {
         return ResponseEntity.ok(service.delete(id));
+    }
+    @Auditable(value = "#{T(this).audit('restore')}")
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<SpecialiteDtoResponse> restore(@PathVariable Long id) {
+        return ResponseEntity.ok(service.restore(id));
+    }
+    @Operation(summary = "Mettre à jour partiellement une entité", responses = {
+            @ApiResponse(responseCode = "200", description = "Mise à jour partielle avec succès"),
+            @ApiResponse(responseCode = "404", description = "Entité non trouvée")
+    })
+    @Auditable(value = "#{T(this).audit('patch')}")
+    @PatchMapping("/{id}")
+    public ResponseEntity<SpecialiteDtoResponse> patch(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
+        return ResponseEntity.ok(service.patchFields(id, fields));
     }
 }
 

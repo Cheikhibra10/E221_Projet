@@ -46,11 +46,20 @@
 	</scm>
 
 	<repositories>
+		<!-- 👇 Dépôt officiel Maven Central (doit être le premier !) -->
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</repository>
+
+		<!-- 👇 Dépôt GitHub Packages pour ton module commun -->
 		<repository>
 			<id>github</id>
 			<url>https://maven.pkg.github.com/Cheikhibra10/commun</url>
 		</repository>
 	</repositories>
+
 
 	<dependencyManagement>
 		<dependencies>
@@ -64,12 +73,13 @@
 		</dependencies>
 	</dependencyManagement>
 
+
 	<dependencies>
 		<!-- Dépendance au module commun -->
 		<dependency>
 			<groupId>com.cheikh</groupId>
 			<artifactId>commun</artifactId>
-			<version>0.0.5-20250630195000</version>
+			<version>0.0.5-20250719174303</version>
 		</dependency>
 
 		<!-- Spring Boot -->
@@ -88,7 +98,10 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
 		<!-- Reflections -->
 		<dependency>
 			<groupId>org.reflections</groupId>
@@ -102,6 +115,11 @@
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
 		<!-- Devtools -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -109,7 +127,21 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
-
+<!--		<dependency>-->
+<!--			<groupId>io.micrometer</groupId>-->
+<!--			<artifactId>micrometer-cache</artifactId>-->
+<!--			<version>1.10.4</version>-->
+<!--		</dependency>-->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-core</artifactId>
+			<version>1.11.4</version> <!-- compatible Spring Boot 3.4 -->
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<version>1.11.4</version> <!-- compatible Spring Boot 3.4 -->
+		</dependency>
 		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

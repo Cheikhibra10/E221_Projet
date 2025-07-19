@@ -13,12 +13,15 @@ public class Semestre implements GenericEntity<Semestre> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String libelle;
-    private int numero;
-    private boolean etat;
+    private String duree;
+    @Enumerated(EnumType.STRING)
+    private Statut statut;
     @Column(columnDefinition = "boolean default false")
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
-
+    @ManyToOne
+    @JoinColumn(name = "niveau", referencedColumnName = "id")
+    private Niveau niveau;
     @Override
     public Semestre createNewInstance() {
         return new Semestre();

@@ -13,14 +13,15 @@ public class Classe implements GenericEntity<Classe> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String libelle;
-    private boolean etat;
+    private String code;
+    @Enumerated(EnumType.STRING)
+    private Statut statut;
     @Column(columnDefinition = "boolean default false")
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
-
     @ManyToOne
-    @JoinColumn(name = "horaire", referencedColumnName = "id")
-    private Horaire horaire;
+    @JoinColumn(name = "domaine", referencedColumnName = "id")
+    private Domaine domaine;
     @ManyToOne
     @JoinColumn(name = "niveau", referencedColumnName = "id")
     private Niveau niveau;

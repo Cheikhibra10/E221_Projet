@@ -11,5 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface DocumentParNiveauRepository extends JpaRepository<DocumentParNiveau, Long> {
+    Optional<DocumentParNiveau> findByNiveauAndDocumentAndArchiveFalse(Niveau niveau, Document document);
 
 }

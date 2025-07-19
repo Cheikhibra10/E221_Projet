@@ -1,0 +1,107 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Mbectemi
+      POSTGRES_DB: pedagogie
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/conf/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgres/conf/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    command: [
+      "postgres",
+      "-c", "config_file=/etc/postgresql/postgresql.conf",
+      "-c", "hba_file=/etc/postgresql/pg_hba.conf"
+    ]
+    networks:
+      - projet
+
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgres
+    networks:
+      - projet
+
+  redis:
+    image: redis:7
+    restart: always
+    networks:
+      - projet
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    networks:
+      - projet
+
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    restart: always
+    command:
+      - "--redis.addr=redis://redis:6379"
+    ports:
+      - "9121:9121"
+    depends_on:
+      - redis
+    networks:
+      - projet
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.15.0
+    restart: always
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:Mbectemi@postgres:5432/pedagogie?sslmode=disable"
+      PG_EXPORTER_EXTEND_QUERY_PATH: /etc/queries.yaml
+    volumes:
+      - ./monitoring/queries.yaml:/etc/queries.yaml:ro
+    depends_on:
+      - postgres
+    networks:
+      - projet
+
+
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - projet
+
+  grafana:
+    image: grafana/grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - projet
+
+volumes:
+  pgdata:
+  grafana-data:
+
+networks:
+  projet:
+    external: true
+

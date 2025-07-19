@@ -1,5 +1,5 @@
 # Ignorer les fichiers secrets
-.env
+../.env
 
 # Dossiers Maven / Java
 target/

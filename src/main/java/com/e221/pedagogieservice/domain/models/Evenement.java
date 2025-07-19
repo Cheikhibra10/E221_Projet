@@ -4,6 +4,7 @@ import com.cheikh.commun.core.GenericEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -17,8 +18,14 @@ public class Evenement implements GenericEntity<Evenement> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String libelle;
-    private boolean statut;
-
+    @Enumerated(EnumType.STRING)
+    private Statut statut;
+    @ManyToOne
+    @JoinColumn(name = "semestre", referencedColumnName = "id")
+    private Semestre semestre;
+    @ManyToOne
+    @JoinColumn(name = "niveau", referencedColumnName = "id")
+    private Niveau niveau;
     @Override
     public Evenement createNewInstance() {
         return new Evenement();

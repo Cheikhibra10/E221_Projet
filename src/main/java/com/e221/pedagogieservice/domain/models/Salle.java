@@ -17,8 +17,9 @@ public class Salle implements GenericEntity<Salle> {
     private Long id;
     private String numero;
     private String libelle;
-    private int effectif;
-    private boolean statut;
+    private int nbrPlace;
+    @Enumerated(EnumType.STRING)
+    private Statut statut;
     @Column(columnDefinition = "boolean default false")
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;

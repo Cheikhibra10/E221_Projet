@@ -1,6 +1,7 @@
 package com.e221.pedagogieservice.domain.models;
 
 import com.cheikh.commun.core.GenericEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
@@ -18,9 +19,11 @@ public class NiveauSpecialite implements GenericEntity<NiveauSpecialite> {
 
     @ManyToOne
     @JoinColumn(name = "niveau", referencedColumnName = "id")
+    @JsonIgnore
     private Niveau niveau;
     @ManyToOne
     @JoinColumn(name = "specialite", referencedColumnName = "id")
+    @JsonIgnore
     private Specialite specialite;
 
 

@@ -1,0 +1,15 @@
+pg_stat_statements:
+  query: "SELECT queryid, query, calls, total_exec_time FROM pg_stat_statements ORDER BY calls DESC LIMIT 5;"
+  metrics:
+    - queryid:
+        usage: "LABEL"
+        description: "ID de la requête"
+    - query:
+        usage: "LABEL"
+        description: "La requête SQL"
+    - calls:
+        usage: "COUNTER"
+        description: "Nombre d'appels"
+    - total_exec_time:
+        usage: "GAUGE"
+        description: "Temps total d'exécution (ms)"

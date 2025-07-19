@@ -1,6 +1,74 @@
-server:
-  port: ${PORT:8080} # PORT injecté par Render
-  forward-headers-strategy: framework
+spring:
+  application:
+    name: pedagogie-service
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/pedagogie
+    username: postgres
+    password: Mbectemi
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  cache:
+    ttl:
+      anneescolaire: 600         # 10 min
+      anneescolaireList: 600
+      semestre: 600              # 10 min
+      semestreList: 600
+      cycle: 900                 # 15 min
+      cycleList: 900
+      niveau: 900                # 15 min
+      niveauList: 900
+      mention: 1200              # 20 min
+      mentionList: 1200
+      specialite: 1200           # 20 min
+      specialiteList: 1200
+      ouverture: 600             # 10 min
+      ouvertureList: 600
+      calendrier: 900            # 15 min
+      calendrierList: 900
+      evenement: 900             # 15 min
+      evenementList: 900
+      salle: 900             # 15 min
+      salleList: 900
+      civility: 900             # 15 min
+      civilityList: 900
+      document: 900             # 15 min
+      documentList: 900
+      parcours: 1800             # 30 min
+      parcoursList: 1800
+      module: 3600               # 1 h
+      moduleList: 3600
+      ue: 3600                   # 1 h
+      ueList: 3600
+      pays: 86400                # 24 h (peu sujet au changement)
+      paysList: 86400
+      mois: 86400                # 24 h
+      moisList: 86400
+      evenementcalendrier: 900  # 15 min
+      evenementcalendrierList: 900
+      sousclasse: 1800          # 30 min
+      sousclasseList: 1800
+      horaire: 900              # 15 min
+      horaireList: 900
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
+
+  cloud:
+    config:
+      enabled: false
+
+  config:
+    import: optional:configserver:http://localhost:8888
 
 springdoc:
   api-docs:
@@ -9,23 +77,28 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-spring:
-  cloud:
-    config:
-      enabled: false
-  config:
-    import: optional:configserver:http://localhost:8888 # facultatif, mais inutile ici
-  application:
-    name: pedagogie-service
+server:
+  port: ${PORT:8086}
+  forward-headers-strategy: framework
 
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, caches, metrics, prometheus
+  endpoint:
+    health:
+      show-details: always
+    caches:
+      enabled: true
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+logging:
+  level:
+    com.e221.pedagogieservice.runtime.config.CacheNameProvider: INFO
+    org.springframework.data.redis.cache: DEBUG

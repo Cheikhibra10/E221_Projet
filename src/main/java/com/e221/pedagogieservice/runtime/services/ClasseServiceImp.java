@@ -1,23 +1,20 @@
 package com.e221.pedagogieservice.runtime.services;
 
-import com.cheikh.commun.exceptions.EntityNotFoundException;
 import com.cheikh.commun.services.MapperService;
-import com.e221.pedagogieservice.domain.constants.ErrorsMessages;
 import com.e221.pedagogieservice.domain.dtos.requests.ClasseDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.requests.SpecialiteDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.responses.ClasseDtoResponse;
-import com.e221.pedagogieservice.domain.dtos.responses.ResponseDtoPaging;
 import com.e221.pedagogieservice.domain.models.*;
-import com.e221.pedagogieservice.domain.repositories.ClasseRepository;
-import com.e221.pedagogieservice.domain.repositories.HoraireRepository;
-import com.e221.pedagogieservice.domain.repositories.NiveauRepository;
-import com.e221.pedagogieservice.domain.repositories.SpecialiteRepository;
+import com.e221.pedagogieservice.domain.repositories.*;
 import com.e221.pedagogieservice.domain.services.ClasseService;
 import com.e221.pedagogieservice.domain.utils.DomainEntityHelper;
+import com.e221.pedagogieservice.runtime.config.CacheNameProvider;
 import com.e221.pedagogieservice.runtime.services.base.DefaultServiceImp;
 import com.e221.pedagogieservice.runtime.specifications.DefaultSpecification;
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,17 +25,28 @@ import java.util.List;
 @Transactional
 @Slf4j
 public class ClasseServiceImp extends DefaultServiceImp<Classe, ClasseDtoRequest, ClasseDtoResponse> implements ClasseService {
+
     private final ClasseRepository repository;
-    private final HoraireRepository horaireRepository;
+    private final DomaineRepository domaineRepository;
     private final NiveauRepository niveauRepository;
     private final SpecialiteRepository specialiteRepository;
-    public ClasseServiceImp(ClasseRepository repository, DefaultSpecification<Classe> defaultSpecification, HoraireRepository horaireRepository, NiveauRepository niveauRepository, SpecialiteRepository specialiteRepository) {
-        super(repository, defaultSpecification);
+    private final EntityManager entityManager;
+
+    public ClasseServiceImp(ClasseRepository repository,
+                            DefaultSpecification<Classe> defaultSpecification,
+                            CacheNameProvider cacheNameProvider,
+                            CacheManager cacheManager,
+                            DomaineRepository domaineRepository,
+                            NiveauRepository niveauRepository,
+                            SpecialiteRepository specialiteRepository, EntityManager entityManager) {
+        super(repository, defaultSpecification, cacheNameProvider, cacheManager);
         this.repository = repository;
-        this.horaireRepository = horaireRepository;
+        this.domaineRepository = domaineRepository;
         this.niveauRepository = niveauRepository;
         this.specialiteRepository = specialiteRepository;
+        this.entityManager = entityManager;
     }
+
 
     @Override
     public ClasseDtoResponse archive(Long id) {
@@ -48,19 +56,62 @@ public class ClasseServiceImp extends DefaultServiceImp<Classe, ClasseDtoRequest
     }
 
     @Override
+    protected Classe createRelationships(Classe classe, ClasseDtoRequest dto) {
+        if (dto.getSpecialite() != null) {
+            Specialite specialite = DomainEntityHelper.findOrCreateStrict(
+                    specialiteRepository,
+                    dto.getSpecialite(),
+                    Specialite.class,
+                    root -> root.get("libelle").in(dto.getSpecialite().getLibelle()), //  dynamic predicate
+                    MapperService::patchEntityFromDto,
+                    entityManager
+            );
+            classe.setSpecialite(specialite);
+        }
+
+        if (dto.getDomaine() != null) {
+            Domaine domaine = DomainEntityHelper.findOrCreateStrict(
+                    domaineRepository,
+                    dto.getDomaine(),
+                    Domaine.class,
+                    root -> root.get("libelle").in(dto.getDomaine().getLibelle()),
+                    MapperService::patchEntityFromDto,
+                    entityManager
+            );
+            classe.setDomaine(domaine);
+        }
+
+        if (dto.getNiveau() != null) {
+            Niveau niveau = DomainEntityHelper.findOrCreateStrict(
+                    niveauRepository,
+                    dto.getNiveau(),
+                    Niveau.class,
+                    root -> root.get("libelle").in(dto.getNiveau().getLibelle()),
+                    MapperService::patchEntityFromDto,
+                    entityManager
+            );
+            classe.setNiveau(niveau);
+        }
+
+
+        return classe;
+    }
+
+
+    @Override
     protected Classe updateRelationships(Classe classe, ClasseDtoRequest dto) {
 
-        if (dto.getHoraire() != null) {
-            Horaire horaire = DomainEntityHelper.findOrUpdate(
-                    horaireRepository,
-                    dto.getHoraire(),
-                    Horaire.class,
-                    existing -> existing.getLibelle().equalsIgnoreCase(dto.getHoraire().getLibelle()),
+        if (dto.getDomaine() != null) {
+            Domaine domaine = DomainEntityHelper.findOrUpdate(
+                    domaineRepository,
+                    dto.getDomaine(),
+                    Domaine.class,
+                    existing -> existing.getLibelle().equalsIgnoreCase(dto.getDomaine().getLibelle()),
                     MapperService::patchEntityFromDto
             );
-            classe.setHoraire(horaire);
-        } else {
-            classe.setHoraire(null);
+            classe.setDomaine(domaine);
+        }else{
+            classe.setDomaine(null);
         }
 
         if (dto.getNiveau() != null) {
@@ -72,7 +123,7 @@ public class ClasseServiceImp extends DefaultServiceImp<Classe, ClasseDtoRequest
                     MapperService::patchEntityFromDto
             );
             classe.setNiveau(niveau);
-        } else {
+        }else{
             classe.setNiveau(null);
         }
 
@@ -82,16 +133,15 @@ public class ClasseServiceImp extends DefaultServiceImp<Classe, ClasseDtoRequest
                     dto.getSpecialite(),
                     Specialite.class,
                     existing ->
-                            existing.getLibelle().equalsIgnoreCase(dto.getSpecialite().getLibelle()) &&
-                                    existing.getNum().equalsIgnoreCase(dto.getSpecialite().getNum()),
+                            existing.getLibelle().equalsIgnoreCase(dto.getSpecialite().getLibelle()),
                     MapperService::patchEntityFromDto
             );
             classe.setSpecialite(specialite);
-        } else {
+        }else{
             classe.setSpecialite(null);
         }
 
         return classe;
     }
-
 }
+

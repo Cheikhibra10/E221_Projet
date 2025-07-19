@@ -2,12 +2,14 @@ package com.e221.pedagogieservice.runtime.controller;
 
 import com.cheikh.commun.config.AuditableUtil;
 import com.cheikh.commun.core.GenericCrudController;
+import com.cheikh.commun.core.PageResponse;
 import com.cheikh.commun.logging.Auditable;
 import com.e221.pedagogieservice.domain.annotation.apiversionning.E221ApiVersion;
 import com.e221.pedagogieservice.domain.dtos.requests.ClasseDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.requests.SpecialiteDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.responses.ClasseDtoResponse;
 import com.e221.pedagogieservice.domain.dtos.responses.ResponseDtoPaging;
+import com.e221.pedagogieservice.domain.dtos.responses.SousClasseDtoResponse;
 import com.e221.pedagogieservice.domain.dtos.responses.SpecialiteDtoResponse;
 import com.e221.pedagogieservice.domain.models.Classe;
 import com.e221.pedagogieservice.domain.models.Specialite;
@@ -25,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @E221ApiVersion
@@ -59,7 +62,7 @@ public class ClasseController {
     })
     @Auditable(value = "#{T(this).audit('update')}")
     @PutMapping("/{id}")
-    public ResponseEntity<ClasseDtoResponse> update(@PathVariable Long id, @Valid @RequestBody ClasseDtoRequest dto) {
+    public ResponseEntity<ClasseDtoResponse> update(@PathVariable Long id,@RequestBody ClasseDtoRequest dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -68,8 +71,11 @@ public class ClasseController {
     })
     @Auditable(value = "#{T(this).audit('get_all')}")
     @GetMapping
-    public ResponseEntity<List<ClasseDtoResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<ClasseDtoResponse>> findAll(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page,size));
     }
 
     @Operation(summary = "Obtenir une entity par ID", responses = {
@@ -90,6 +96,22 @@ public class ClasseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ClasseDtoResponse> delete(@PathVariable Long id) {
         return ResponseEntity.ok(service.delete(id));
+    }
+
+    @Auditable(value = "#{T(this).audit('restore')}")
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<ClasseDtoResponse> restore(@PathVariable Long id) {
+        return ResponseEntity.ok(service.restore(id));
+    }
+
+    @Operation(summary = "Mettre à jour partiellement une entité", responses = {
+            @ApiResponse(responseCode = "200", description = "Mise à jour partielle avec succès"),
+            @ApiResponse(responseCode = "404", description = "Entité non trouvée")
+    })
+    @Auditable(value = "#{T(this).audit('patch')}")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ClasseDtoResponse> patch(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
+        return ResponseEntity.ok(service.patchFields(id, fields));
     }
 }
 

@@ -1,6 +1,7 @@
 package com.e221.pedagogieservice.domain.models;
 
 import com.cheikh.commun.core.GenericEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
@@ -21,6 +22,7 @@ public class MentionUE implements GenericEntity<MentionUE> {
     private Mention mention;
     @ManyToOne
     @JoinColumn(name = "ue", referencedColumnName = "id")
+    @JsonIgnore
     private UE ue;
 
 

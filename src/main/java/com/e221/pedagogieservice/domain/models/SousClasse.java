@@ -15,15 +15,17 @@ public class SousClasse implements GenericEntity<SousClasse> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String libelle;
-    private int nbrEleve;
-    private boolean etat;
+    @Enumerated(EnumType.STRING)
+    private Statut statut;
     @Column(columnDefinition = "boolean default false")
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
-
     @ManyToOne
     @JoinColumn(name = "classe", referencedColumnName = "id")
     private Classe classe;
+    @ManyToOne
+    @JoinColumn(name = "semestre", referencedColumnName = "id")
+    private Semestre semestre;
 
     @Override
     public SousClasse createNewInstance() {

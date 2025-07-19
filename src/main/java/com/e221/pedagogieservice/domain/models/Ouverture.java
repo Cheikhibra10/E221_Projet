@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -18,9 +19,10 @@ public class Ouverture implements GenericEntity<Ouverture> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String libelle;
-    private boolean statut;
-    private Date dateDebut;
-    private Date dateFin;
+    @Enumerated(EnumType.STRING)
+    private Statut statut;
+    private LocalDate dateDebut;
+    private LocalDate dateFin;
     @Column(columnDefinition = "boolean default false")
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;

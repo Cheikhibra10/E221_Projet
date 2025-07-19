@@ -1,6 +1,7 @@
 package com.e221.pedagogieservice.domain.models;
 
 import com.cheikh.commun.core.GenericEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
@@ -21,6 +22,7 @@ public class DocumentParNiveau implements GenericEntity<DocumentParNiveau> {
 
     @ManyToOne
     @JoinColumn(name = "document", referencedColumnName = "id")
+    @JsonIgnore
     private Document document;
     @ManyToOne
     @JoinColumn(name = "niveau", referencedColumnName = "id")

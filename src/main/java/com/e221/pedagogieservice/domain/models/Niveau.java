@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
 public class Niveau implements GenericEntity<Niveau> {
@@ -14,19 +17,13 @@ public class Niveau implements GenericEntity<Niveau> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String libelle;
-    private int niveau;
-    private boolean etat;
+    private Statut statut;
     @Column(columnDefinition = "boolean default false")
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
-
     @ManyToOne
     @JoinColumn(name = "cycle", referencedColumnName = "id")
     private Cycle cycle;
-    @ManyToOne
-    @JoinColumn(name = "parcours", referencedColumnName = "id")
-    private Parcours parcours;
-
     @Override
     public Niveau createNewInstance() {
         return new Niveau();
