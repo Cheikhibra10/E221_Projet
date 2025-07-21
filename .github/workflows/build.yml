@@ -10,24 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout pedagogie-service repository
       - name: 📦 Checkout code
         uses: actions/checkout@v3
         with:
           persist-credentials: true
           fetch-depth: 0
 
-      # 2. Get commun version from dispatch event
       - name: 🏷️ Get commun version
         id: get-version
         run: echo "commun_version=${{ github.event.client_payload.version }}" >> $GITHUB_OUTPUT
 
-      # 3. Display commun version
       - name: 📝 Display commun version
         run: |
           echo "Using commun version: ${{ steps.get-version.outputs.commun_version }}"
-          
-          # 4. Setup Java 21
+
       - name: ☕ Setup Java 21
         uses: actions/setup-java@v3
         with:
@@ -35,7 +31,6 @@ jobs:
           java-version: 21
           cache: maven
 
-      # 5. Configure Maven
       - name: 🔐 Configure Maven settings
         run: |
           mkdir -p ~/.m2
@@ -51,25 +46,24 @@ jobs:
           </settings>
           EOF
 
-      # 6. Make mvnw executable
       - name: Make mvnw executable
         run: chmod +x ./mvnw
 
-      # 7. Update commun.version in pom.xml
-      - name: 🛠 Update commun.version
+      - name: 🛠 Update commun.version in pom.xml
         run: |
           ./mvnw versions:set-property -Dproperty=commun.version -DnewVersion=${{ steps.get-version.outputs.commun_version }} -DgenerateBackupPoms=false
           ./mvnw versions:commit
 
-      # 8. Commit updated pom.xml (optional)
       - name: ✅ Commit updated pom.xml
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git diff --quiet || (git add pom.xml && git commit -m "🔄 MAJ commun.version => ${{ steps.get-version.outputs.commun_version }}" && git push origin HEAD)
+          git add pom.xml
+          git commit -m "🔄 MAJ commun.version => ${{ steps.get-version.outputs.commun_version }}" || echo "Pas de changement à commiter"
+          git pull --rebase origin master
+          git push origin HEAD
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 9. Build & Deploy pedagogie-service
       - name: 🚀 Build and Deploy pedagogie-service
         run: ./mvnw deploy -DskipTests
