@@ -1,18 +1,12 @@
 package com.e221.pedagogieservice.runtime.controller;
 
 import com.cheikh.commun.config.AuditableUtil;
-import com.cheikh.commun.core.GenericCrudController;
 import com.cheikh.commun.core.PageResponse;
 import com.cheikh.commun.logging.Auditable;
 import com.e221.pedagogieservice.domain.annotation.apiversionning.E221ApiVersion;
-import com.e221.pedagogieservice.domain.dtos.requests.SpecialiteDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.requests.UeDtoRequest;
-import com.e221.pedagogieservice.domain.dtos.responses.SpecialiteDtoResponse;
 import com.e221.pedagogieservice.domain.dtos.responses.UeDtoResponse;
 import com.e221.pedagogieservice.domain.models.Specialite;
-import com.e221.pedagogieservice.domain.models.UE;
-import com.e221.pedagogieservice.domain.services.UeService;
-import com.e221.pedagogieservice.runtime.services.SpecialiteServiceImp;
 import com.e221.pedagogieservice.runtime.services.UEServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
