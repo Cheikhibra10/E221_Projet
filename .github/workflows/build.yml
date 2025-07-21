@@ -85,6 +85,7 @@ jobs:
           ls -lh target/
 
       # 10. Commit updated pom.xml
+      # 10. Commit updated pom.xml
       - name: ✅ Commit updated pom.xml
         run: |
           git config user.name "${{ github.actor }}"
@@ -95,6 +96,28 @@ jobs:
           git push origin HEAD
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 10bis. Fix NULL values in cycle table before deploy
+      - name: 🛠 Fix cycle table (NULL -> 0)
+        run: |
+          echo "Fixing cycle table..."
+          cat <<'EOF' > fix_cycle.sql
+          UPDATE cycle SET taux_horaire = 0 WHERE taux_horaire IS NULL;
+          ALTER TABLE cycle ALTER COLUMN taux_horaire SET DEFAULT 0;
+          ALTER TABLE cycle ALTER COLUMN taux_horaire SET NOT NULL;
+          EOF
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+           PGPASSWORD="${{ secrets.DB_PASSWORD }}" psql \
+            -h "${{ secrets.DB_HOST }}" \
+            -U "${{ secrets.DB_USER }}" \
+            -d "${{ secrets.DB_NAME }}" \
+            -p 5432 \
+            -f fix_cycle.sql
+
+      # 11. Build and Deploy pedagogie-service
+      - name: 🚀 Build and Deploy pedagogie-service
+        run: ./mvnw deploy -DskipTests
+
 
       # 11. Build and Deploy pedagogie-service
       - name: 🚀 Build and Deploy pedagogie-service
