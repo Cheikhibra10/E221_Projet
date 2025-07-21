@@ -96,39 +96,72 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 10bis. Fix NULL values in cycle table before deploy
-      - name: 🛠 Fix cycle table (NULL -> 0)
+      # 10bis. Ensure cycle.taux_horaire exists, fill NULLs, set default, enforce NOT NULL when safe
+      - name: 🛠 Ensure cycle.taux_horaire column
         run: |
-          if [ -z "${{ secrets.DB_HOST }}" ]; then
-            echo "⚠️ Secrets DB_* non définis, on saute cette étape."
-            exit 0
+          # --- Validate required DB secrets ---
+          if [ -z "${{ secrets.DB_HOST }}" ] || [ -z "${{ secrets.DB_USER }}" ] || [ -z "${{ secrets.DB_PASSWORD }}" ] || [ -z "${{ secrets.DB_NAME }}" ]; then
+          echo "❌ DB secrets missing (DB_HOST/USER/PASSWORD/NAME). Skipping DB fix and failing."
+          exit 1
           fi
-
-          echo "Fixing cycle table..."
+          
+          DB_PORT="${{ secrets.DB_PORT }}"
+          if [ -z "$DB_PORT" ]; then DB_PORT=5432; fi
+          
+          echo "🔧 Preparing SQL fix script for cycle.taux_horaire ..."
           cat <<'EOF' > fix_cycle.sql
+          -- 1) Add column if missing (no NOT NULL yet; default 0 fills existing rows on add)
+          DO $$
+          BEGIN
+          IF NOT EXISTS (
+           SELECT 1 FROM information_schema.columns
+           WHERE table_name = 'cycle' AND column_name = 'taux_horaire'
+          ) THEN
+           EXECUTE 'ALTER TABLE cycle ADD COLUMN taux_horaire NUMERIC DEFAULT 0';
+          END IF;
+          END$$;
+          
+          -- 2) Backfill NULLs (covers case where column existed but had NULLs)
           UPDATE cycle SET taux_horaire = 0 WHERE taux_horaire IS NULL;
+          
+          -- 3) Ensure future inserts default to 0
           ALTER TABLE cycle ALTER COLUMN taux_horaire SET DEFAULT 0;
-          ALTER TABLE cycle ALTER COLUMN taux_horaire SET NOT NULL;
+          
+          -- 4) Enforce NOT NULL only if safe
+          DO $$
+          DECLARE c int;
+          BEGIN
+          SELECT COUNT(*) INTO c FROM cycle WHERE taux_horaire IS NULL;
+          IF c = 0 THEN
+           EXECUTE 'ALTER TABLE cycle ALTER COLUMN taux_horaire SET NOT NULL';
+          ELSE
+           RAISE NOTICE 'NOT setting NOT NULL on cycle.taux_horaire: % NULL rows remain.', c;
+          END IF;
+          END$$;
           EOF
-
-          sudo apt-get update && sudo apt-get install -y postgresql-client
-
-          echo "Testing DB connection..."
+          
+          echo "📦 Installing PostgreSQL client..."
+          apt-get update -y >/dev/null 2>&1
+          apt-get install -y postgresql-client >/dev/null 2>&1
+          
+          echo "🔗 Testing DB connection..."
           PGPASSWORD="${{ secrets.DB_PASSWORD }}" psql \
-            -h "${{ secrets.DB_HOST }}" \
-            -U "${{ secrets.DB_USER }}" \
-            -d "${{ secrets.DB_NAME }}" \
-            -p 5432 \
-            -c '\dt' || { echo "❌ DB connection failed"; exit 1; }
-
-          echo "Applying cycle fix..."
+          -h "${{ secrets.DB_HOST }}" \
+          -U "${{ secrets.DB_USER }}" \
+          -d "${{ secrets.DB_NAME }}" \
+          -p "$DB_PORT" \
+          -c '\dt' || { echo "❌ DB connection failed"; exit 1; }
+          
+          echo "🚀 Applying SQL fix..."
           PGPASSWORD="${{ secrets.DB_PASSWORD }}" psql \
-            -h "${{ secrets.DB_HOST }}" \
-            -U "${{ secrets.DB_USER }}" \
-            -d "${{ secrets.DB_NAME }}" \
-            -p 5432 \
-            -f fix_cycle.sql
-
-      # 11. Build and Deploy pedagogie-service
+          -h "${{ secrets.DB_HOST }}" \
+          -U "${{ secrets.DB_USER }}" \
+          -d "${{ secrets.DB_NAME }}" \
+          -p "$DB_PORT" \
+          -f fix_cycle.sql
+          
+          echo "✅ cycle.taux_horaire fix step complete."
+          
+          # 11. Build and Deploy pedagogie-service
       - name: 🚀 Build and Deploy pedagogie-service
         run: ./mvnw deploy -DskipTests
