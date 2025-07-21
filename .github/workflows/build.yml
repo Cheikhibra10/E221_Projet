@@ -17,12 +17,12 @@ jobs:
           persist-credentials: true
           fetch-depth: 0
 
-      # 2. Get commun version from repository_dispatch event
+      # 2. Get commun version from repository_dispatch event (may be empty if manual run)
       - name: 🏷️ Get commun version
         id: get-version
-        run: echo "commun_version=${{ github.event.client_payload.version }}" >> $GITHUB_OUTPUT
+        run: echo "commun_version=${{ github.event.client_payload.version }}" >> "$GITHUB_OUTPUT"
 
-      # 3. Display commun version
+      # 3. Display commun version (debug)
       - name: 📝 Display commun version
         run: |
           echo "Using commun version: ${{ steps.get-version.outputs.commun_version }}"
@@ -39,30 +39,31 @@ jobs:
       - name: 🔐 Configure Maven settings
         run: |
           mkdir -p ~/.m2
-          cat <<EOF > ~/.m2/settings.xml
+          cat <<'EOF' > ~/.m2/settings.xml
           <settings>
             <servers>
               <server>
                 <id>github</id>
-                <username>${{ github.actor }}</username>
-                <password>${{ secrets.GITHUB_TOKEN }}</password>
+                <username>${env.GITHUB_ACTOR}</username>
+                <password>${env.GITHUB_TOKEN}</password>
               </server>
             </servers>
           </settings>
           EOF
 
       # 6. Make Maven Wrapper executable
-      - name: Make mvnw executable
+      - name: 🔧 Make mvnw executable
         run: chmod +x ./mvnw
 
-      # 7. Clean project and local cache of commun
-      - name: Force clean
+      # 7. Clean project and local cache of commun (forces fresh resolve)
+      - name: 🧹 Clean project & clear commun cache
         run: |
           rm -rf ~/.m2/repository/com/cheikh/commun
           ./mvnw clean
 
-      # 8. Update commun.version in pom.xml
+      # 8. Update commun.version in pom.xml (skip if no version from event)
       - name: 🛠 Update commun.version in pom.xml
+        if: ${{ steps.get-version.outputs.commun_version != '' }}
         run: |
           ./mvnw versions:set-property \
             -Dproperty=commun.version \
@@ -70,55 +71,59 @@ jobs:
             -DgenerateBackupPoms=false
           ./mvnw versions:commit
 
-            # 9. Debug updated POM version & build
-      - name: Debug Maven Version
+      # 9. Debug Maven Version & pre-build
+      - name: 🔍 Debug Maven version & package
         run: |
-          echo "Commun version now set to:"
-          ./mvnw help:evaluate -Dexpression=commun.version -q -DforceStdout
+          echo "Commun version property:"
+          ./mvnw help:evaluate -Dexpression=commun.version -q -DforceStdout || echo "(no commun.version property)"
           echo "Project version:"
           ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout
-          
           echo "Building project (package)..."
           ./mvnw package -DskipTests
-
           echo "Content of target directory:"
-          ls -lh target/
+          ls -lh target/ || echo "target/ not found"
 
-      # 10. Commit updated pom.xml
-      # 10. Commit updated pom.xml
+      # 10. Commit updated pom.xml (only if changed)
       - name: ✅ Commit updated pom.xml
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
           git add pom.xml
-          git commit -m "🔄 MAJ commun.version => ${{ steps.get-version.outputs.commun_version }}" || echo "Pas de changement à commiter"
+          git diff --cached --quiet || git commit -m "🔄 MAJ commun.version => ${{ steps.get-version.outputs.commun_version }}"
           git pull --rebase origin master
           git push origin HEAD
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 10bis. Fix NULL values in cycle table before deploy
+      # 10bis. Fix NULL values in cycle table before deploy (requires DB_* secrets)
       - name: 🛠 Fix cycle table (NULL -> 0)
+        if: ${{ secrets.DB_HOST != '' && secrets.DB_USER != '' && secrets.DB_PASSWORD != '' && secrets.DB_NAME != '' }}
         run: |
-          echo "Fixing cycle table..."
+          echo "Fixing cycle table on remote DB..."
           cat <<'EOF' > fix_cycle.sql
           UPDATE cycle SET taux_horaire = 0 WHERE taux_horaire IS NULL;
           ALTER TABLE cycle ALTER COLUMN taux_horaire SET DEFAULT 0;
           ALTER TABLE cycle ALTER COLUMN taux_horaire SET NOT NULL;
           EOF
-          sudo apt-get update && sudo apt-get install -y postgresql-client
-           PGPASSWORD="${{ secrets.DB_PASSWORD }}" psql \
+
+          apt-get update && apt-get install -y postgresql-client
+
+          echo "Testing DB connection..."
+          PGPASSWORD="${{ secrets.DB_PASSWORD }}" psql \
+            -h "${{ secrets.DB_HOST }}" \
+            -U "${{ secrets.DB_USER }}" \
+            -d "${{ secrets.DB_NAME }}" \
+            -p 5432 \
+            -c '\dt' || { echo "❌ DB connection failed"; exit 1; }
+
+          echo "Applying cycle fix..."
+          PGPASSWORD="${{ secrets.DB_PASSWORD }}" psql \
             -h "${{ secrets.DB_HOST }}" \
             -U "${{ secrets.DB_USER }}" \
             -d "${{ secrets.DB_NAME }}" \
             -p 5432 \
             -f fix_cycle.sql
 
-      # 11. Build and Deploy pedagogie-service
-      - name: 🚀 Build and Deploy pedagogie-service
-        run: ./mvnw deploy -DskipTests
-
-
-      # 11. Build and Deploy pedagogie-service
-      - name: 🚀 Build and Deploy pedagogie-service
+      # 11. Build & Deploy pedagogie-service
+      - name: 🚀 Build & Deploy pedagogie-service
         run: ./mvnw deploy -DskipTests
