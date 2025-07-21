@@ -70,14 +70,19 @@ jobs:
             -DgenerateBackupPoms=false
           ./mvnw versions:commit
 
-      # 9. Debug updated POM version
+            # 9. Debug updated POM version & build
       - name: Debug Maven Version
         run: |
           echo "Commun version now set to:"
-          ./mvnw help:evaluate -Dexpression=commun.version -q -DforceStdout || true
+          ./mvnw help:evaluate -Dexpression=commun.version -q -DforceStdout
           echo "Project version:"
           ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout
-          ls -lh target/ || echo "target/ is empty"
+          
+          echo "Building project (package)..."
+          ./mvnw package -DskipTests
+
+          echo "Content of target directory:"
+          ls -lh target/
 
       # 10. Commit updated pom.xml
       - name: ✅ Commit updated pom.xml
