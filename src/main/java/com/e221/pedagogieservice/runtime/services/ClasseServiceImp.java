@@ -57,40 +57,25 @@ public class ClasseServiceImp extends DefaultServiceImp<Classe, ClasseDtoRequest
 
     @Override
     protected Classe createRelationships(Classe classe, ClasseDtoRequest dto) {
-        if (dto.getSpecialite() != null) {
-            Specialite specialite = DomainEntityHelper.findOrCreateStrict(
-                    specialiteRepository,
-                    dto.getSpecialite(),
-                    Specialite.class,
-                    root -> root.get("libelle").in(dto.getSpecialite().getLibelle()), //  dynamic predicate
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
-            classe.setSpecialite(specialite);
-        }
-
-        if (dto.getDomaine() != null) {
-            Domaine domaine = DomainEntityHelper.findOrCreateStrict(
-                    domaineRepository,
-                    dto.getDomaine(),
-                    Domaine.class,
-                    root -> root.get("libelle").in(dto.getDomaine().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
-            classe.setDomaine(domaine);
-        }
-
-        if (dto.getNiveau() != null) {
-            Niveau niveau = DomainEntityHelper.findOrCreateStrict(
-                    niveauRepository,
-                    dto.getNiveau(),
-                    Niveau.class,
-                    root -> root.get("libelle").in(dto.getNiveau().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        if (dto.getNiveauId() != null) {
+            Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
             classe.setNiveau(niveau);
+        } else {
+            classe.setNiveau(null);
+        }
+
+        if (dto.getDomaineId() != null) {
+            Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, dto.getDomaineId(), Domaine.class);
+            classe.setDomaine(domaine);
+        } else {
+            classe.setDomaine(null);
+        }
+
+        if (dto.getSpecialiteId() != null) {
+            Specialite specialite = DomainEntityHelper.findStrictById(specialiteRepository, dto.getSpecialiteId(), Specialite.class);
+            classe.setSpecialite(specialite);
+        } else {
+            classe.setSpecialite(null);
         }
 
 
@@ -101,43 +86,24 @@ public class ClasseServiceImp extends DefaultServiceImp<Classe, ClasseDtoRequest
     @Override
     protected Classe updateRelationships(Classe classe, ClasseDtoRequest dto) {
 
-        if (dto.getDomaine() != null) {
-            Domaine domaine = DomainEntityHelper.findOrUpdate(
-                    domaineRepository,
-                    dto.getDomaine(),
-                    Domaine.class,
-                    existing -> existing.getLibelle().equalsIgnoreCase(dto.getDomaine().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
-            classe.setDomaine(domaine);
-        }else{
-            classe.setDomaine(null);
-        }
-
-        if (dto.getNiveau() != null) {
-            Niveau niveau = DomainEntityHelper.findOrUpdate(
-                    niveauRepository,
-                    dto.getNiveau(),
-                    Niveau.class,
-                    existing -> existing.getLibelle().equalsIgnoreCase(dto.getNiveau().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
+        if (dto.getNiveauId() != null) {
+            Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
             classe.setNiveau(niveau);
-        }else{
+        } else {
             classe.setNiveau(null);
         }
 
-        if (dto.getSpecialite() != null) {
-            Specialite specialite = DomainEntityHelper.findOrUpdate(
-                    specialiteRepository,
-                    dto.getSpecialite(),
-                    Specialite.class,
-                    existing ->
-                            existing.getLibelle().equalsIgnoreCase(dto.getSpecialite().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
+        if (dto.getDomaineId() != null) {
+            Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, dto.getDomaineId(), Domaine.class);
+            classe.setDomaine(domaine);
+        } else {
+            classe.setDomaine(null);
+        }
+
+        if (dto.getSpecialiteId() != null) {
+            Specialite specialite = DomainEntityHelper.findStrictById(specialiteRepository, dto.getSpecialiteId(), Specialite.class);
             classe.setSpecialite(specialite);
-        }else{
+        } else {
             classe.setSpecialite(null);
         }
 

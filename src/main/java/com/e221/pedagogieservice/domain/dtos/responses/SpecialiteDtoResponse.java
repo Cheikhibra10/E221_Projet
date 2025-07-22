@@ -2,6 +2,7 @@ package com.e221.pedagogieservice.domain.dtos.responses;
 
 import com.e221.pedagogieservice.domain.dtos.requests.DomaineDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.requests.NiveauDtoRequest;
+import com.e221.pedagogieservice.domain.models.Statut;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class SpecialiteDtoResponse {
     private Long id;
     private String libelle;
-    private boolean etat;
+    private Statut statut;
     private boolean archive;
     private MentionDtoResponse mention;
     private DomaineDtoResponse domaine;

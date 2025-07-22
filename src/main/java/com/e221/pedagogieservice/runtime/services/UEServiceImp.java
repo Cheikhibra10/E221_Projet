@@ -78,9 +78,9 @@ public class UEServiceImp
     protected UE createRelationships(UE ue, UeDtoRequest dto) {
         if (dto.getMentions() != null && !dto.getMentions().isEmpty()) {
             List<MentionUE> links = dto.getMentions().stream()
-                    .map(mentionDto -> {
-                        Mention mention = mentionRepository.findById(mentionDto.getId())
-                                .orElseThrow(() -> new EntityNotFoundException("Mention not found id=" + mentionDto.getId()));
+                    .map(mentionId -> {
+                        Mention mention = mentionRepository.findById(mentionId)
+                                .orElseThrow(() -> new EntityNotFoundException("Mention not found id=" + mentionId));
                         MentionUE mentionUE = new MentionUE();
                         mentionUE.setUe(ue);
                         mentionUE.setMention(mention);
@@ -98,9 +98,9 @@ public class UEServiceImp
             ue.getMentionUES().clear();
             if (!dto.getMentions().isEmpty()) {
                 List<MentionUE> links = dto.getMentions().stream()
-                        .map(nivDto -> {
-                            Mention mention = mentionRepository.findById(nivDto.getId())
-                                    .orElseThrow(() -> new EntityNotFoundException("Mention not found id=" + nivDto.getId()));
+                        .map(mentionId -> {
+                            Mention mention = mentionRepository.findById(mentionId)
+                                    .orElseThrow(() -> new EntityNotFoundException("Mention not found id=" + mentionId));
                             MentionUE mentionUE = new MentionUE();
                             mentionUE.setUe(ue);
                             mentionUE.setMention(mention);

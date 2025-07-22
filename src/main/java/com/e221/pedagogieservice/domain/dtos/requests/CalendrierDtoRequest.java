@@ -1,6 +1,7 @@
 package com.e221.pedagogieservice.domain.dtos.requests;
 
 import com.e221.pedagogieservice.domain.models.Statut;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -20,22 +21,15 @@ public class CalendrierDtoRequest {
 
     @NotNull(message = "La date de début est obligatoire.")
     @FutureOrPresent(message = "La date de début doit être dans le présent ou le futur.")
-    private Date dateDebut;
-
+    private LocalDate dateDebut;
     @NotNull(message = "La date de fin est obligatoire.")
     @Future(message = "La date de fin doit être dans le futur.")
-    private Date dateFin;
-
-    @NotNull(message = "Le statut est obligatoire.")
+    private LocalDate dateFin;
     private Statut statut;
-
-    @NotNull(message = "Le champ 'archive' est obligatoire.")
-    private Boolean archive;
-
+    private boolean archive;
     @NotNull(message = "Le niveau est obligatoire.")
-    private NiveauDtoRequest niveau;
+    private Long niveauId;
     @NotNull(message = "Le semestre est obligatoire.")
-    private SemestreDtoRequest semestre;
-
-    private List<EvenementDtoRequest> evenements;
+    private Long semestreId;
+    private List<Long> evenements;
 }

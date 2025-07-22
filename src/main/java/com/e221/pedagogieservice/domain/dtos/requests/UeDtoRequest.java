@@ -2,6 +2,7 @@ package com.e221.pedagogieservice.domain.dtos.requests;
 
 import com.e221.pedagogieservice.domain.models.Mention;
 import com.e221.pedagogieservice.domain.models.Statut;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -23,11 +24,8 @@ public class UeDtoRequest {
     @NotBlank(message = "Le libellé est obligatoire.")
     @Size(min = 2, max = 100, message = "Le libellé doit contenir entre 2 et 100 caractères.")
     private String libelle;
-
-    @NotNull(message = "L'état est obligatoire.")
     private Statut statut;
-
-    private Boolean archive;
-    private List<MentionDtoRequest> mentions;
+    private boolean archive;
+    private List<Long> mentions;
 
 }

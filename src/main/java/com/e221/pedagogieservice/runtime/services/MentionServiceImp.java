@@ -1,5 +1,7 @@
 package com.e221.pedagogieservice.runtime.services;
 
+import com.cheikh.commun.exceptions.BadRequestException;
+import com.cheikh.commun.exceptions.EntityNotFoundException;
 import com.cheikh.commun.services.MapperService;
 import com.e221.pedagogieservice.domain.dtos.requests.MentionDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.responses.MentionDtoResponse;
@@ -60,18 +62,20 @@ public class MentionServiceImp
 
     // 🔗 Gestion relation lors de la création
     @Override
+    @Transactional
     protected Mention createRelationships(Mention mention, MentionDtoRequest dto) {
-        if (dto.getDomaine() != null) {
-            Domaine domaine = DomainEntityHelper.findOrCreateStrict(
-                    domaineRepository,
-                    dto.getDomaine(),
-                    Domaine.class,
-                    root -> root.get("libelle").in(dto.getDomaine().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
-            mention.setDomaine(domaine);
+        // domaineId est obligatoire (validé au niveau DTO, mais on recheck par sécurité)
+        Long domaineId = dto.getDomaineId();
+        if (domaineId == null) {
+            throw new BadRequestException("domaineId obligatoire pour créer une Mention.");
         }
+
+        // Chargement strict (échec si non trouvé)
+        Domaine domaine = domaineRepository.findById(domaineId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Domaine introuvable (id=" + domaineId + ")."));
+
+        mention.setDomaine(domaine);
         return mention;
     }
 
@@ -79,14 +83,9 @@ public class MentionServiceImp
     // 🔗 Gestion relation lors de la mise à jour
     @Override
     protected Mention updateRelationships(Mention mention, MentionDtoRequest dto) {
-        if (dto.getDomaine() != null) {
-            Domaine domaine = DomainEntityHelper.findOrUpdate(
-                    domaineRepository,
-                    dto.getDomaine(),
-                    Domaine.class,
-                    existing -> existing.getLibelle().equalsIgnoreCase(dto.getDomaine().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
+        Long domaineId = dto.getDomaineId();
+        if (domaineId != null) {
+            Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, domaineId, Domaine.class);
             mention.setDomaine(domaine);
         } else {
             mention.setDomaine(null);

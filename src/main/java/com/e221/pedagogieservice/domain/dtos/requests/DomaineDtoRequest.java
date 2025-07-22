@@ -1,5 +1,6 @@
 package com.e221.pedagogieservice.domain.dtos.requests;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
 import lombok.*;
@@ -16,10 +17,8 @@ public class DomaineDtoRequest {
     @NotBlank(message = "Le libellé du domaine est obligatoire.")
     @Size(min = 2, max = 100, message = "Le libellé du domaine doit contenir entre 2 et 100 caractères.")
     private String libelle;
+    private boolean etat = true;
+    private boolean archive;
 
-    @NotNull(message = "Le champ 'état' est obligatoire.")
-    private Boolean etat;
 
-    @NotNull(message = "Le champ 'archive' est obligatoire.")
-    private Boolean archive;
 }

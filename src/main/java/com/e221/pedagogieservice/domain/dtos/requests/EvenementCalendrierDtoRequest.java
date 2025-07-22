@@ -1,10 +1,12 @@
 package com.e221.pedagogieservice.domain.dtos.requests;
 
 import com.e221.pedagogieservice.domain.models.Statut;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @NoArgsConstructor
@@ -25,12 +27,13 @@ public class EvenementCalendrierDtoRequest {
 
     @NotNull(message = "La date de début est obligatoire.")
     @FutureOrPresent(message = "La date de début doit être aujourd’hui ou dans le futur.")
-    private Date dateDebut;
+    private LocalDate dateDebut;
 
     @NotNull(message = "La date de fin est obligatoire.")
     @Future(message = "La date de fin doit être dans le futur.")
-    private Date dateFin;
+    private LocalDate dateFin;
 
+    @Column(nullable = false)
     private boolean archive;
 
     @NotNull(message = "Le calendrier associé est obligatoire.")

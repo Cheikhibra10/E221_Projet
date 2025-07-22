@@ -1,195 +1,103 @@
 package com.e221.pedagogieservice.domain.utils;
 
-import com.cheikh.commun.core.GenericEntity;
-import com.cheikh.commun.core.GenericRepository;
-import com.cheikh.commun.exceptions.BadRequestException;
 import com.cheikh.commun.exceptions.EntityNotFoundException;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
-public class DomainEntityHelper {
-    public static <T, D> T findOrCreateStrict(
-            JpaRepository<T, Long> repository,
-            D dto,
-            Class<T> entityClass,
-            Function<Root<T>, Predicate> businessPredicate, //  Accepts JPA predicate
-            BiConsumer<T, D> fieldUpdater,
-            EntityManager entityManager //  Required for Criteria API
-    ) {
-        Objects.requireNonNull(repository);
-        Objects.requireNonNull(dto);
+public final class DomainEntityHelper {
 
-        try {
-            //  Check if ID is present
-            Field idField = dto.getClass().getDeclaredField("id");
-            idField.setAccessible(true);
-            Object idValue = idField.get(dto);
+    private DomainEntityHelper() {}
 
-            if (idValue instanceof Long id && id > 0) {
-                return repository.findById(id)
-                        .map(existing -> {
-                            if (fieldUpdater != null) fieldUpdater.accept(existing, dto);
-                            return repository.save(existing);
-                        })
-                        .orElseThrow(() -> new EntityNotFoundException("Entity not found with id: " + id));
-            }
-        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
-
-        //  Build JPA Criteria Query for uniqueness check
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> query = cb.createQuery(Long.class);
-        Root<T> root = query.from(entityClass);
-        query.select(cb.count(root)).where(businessPredicate.apply(root));
-
-        Long count = entityManager.createQuery(query).getSingleResult();
-        if (count > 0) {
-            throw new BadRequestException("Entity %s with same business key already exists"
-                    .formatted(entityClass.getSimpleName()));
-        }
-
-        //  Create new entity
-        try {
-            T newEntity = entityClass.getDeclaredConstructor().newInstance();
-            if (fieldUpdater != null) fieldUpdater.accept(newEntity, dto);
-            return repository.save(newEntity);
-        } catch (Exception e) {
-            throw new IllegalStateException("Cannot create new instance of " + entityClass.getSimpleName(), e);
+    /* ------------------------------------------------------------------ */
+    /*  Validation interne                                                */
+    /* ------------------------------------------------------------------ */
+    private static void requireValidId(Long id, String name) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException(name + " id is required and must be > 0");
+            // Remplace par BadRequestException si tu en utilises une :
+            // throw new BadRequestException(name + " id is required and must be > 0");
         }
     }
 
-    public static <T extends GenericEntity<T>, D> List<T> findOrCreateListStrict(
-            GenericRepository<T> repository,
-            List<D> dtoList,
-            Class<T> entityClass,
-            Function<D, Specification<T>> specificationProvider,
-            BiConsumer<T, D> fieldUpdater,
-            EntityManager entityManager
-    ) {
-        Objects.requireNonNull(dtoList);
-        return dtoList.stream()
-                .map(dto -> {
-                    try {
-                        Field idField = dto.getClass().getDeclaredField("id");
-                        idField.setAccessible(true);
-                        Object idValue = idField.get(dto);
+    /* ------------------------------------------------------------------ */
+    /*  Chargements stricts                                               */
+    /* ------------------------------------------------------------------ */
 
-                        if (idValue instanceof Long id && id > 0) {
-                            return repository.findById(id)
-                                    .map(existing -> {
-                                        if (fieldUpdater != null) fieldUpdater.accept(existing, dto);
-                                        return repository.save(existing);
-                                    })
-                                    .orElseThrow(() -> new EntityNotFoundException("Entity not found with id: " + id));
-                        }
-                    } catch (Exception ignored) {}
-
-                    // Check uniqueness by Specification
-                    List<T> existing = repository.findAll(specificationProvider.apply(dto));
-                    if (!existing.isEmpty()) {
-                        throw new BadRequestException("Entity with same business key already exists");
-                    }
-
-                    // Create new
-                    try {
-                        T newEntity = entityClass.getDeclaredConstructor().newInstance();
-                        if (fieldUpdater != null) fieldUpdater.accept(newEntity, dto);
-                        return repository.save(newEntity);
-                    } catch (Exception e) {
-                        throw new IllegalStateException("Cannot create new instance of " + entityClass.getSimpleName(), e);
-                    }
-                })
-                .toList();
+    /**
+     * Charge une entité par ID ou lève une EntityNotFoundException.
+     */
+    public static <T> T findStrictById(JpaRepository<T, Long> repository, Long id, Class<T> entityClass) {
+        Objects.requireNonNull(repository, "repository");
+        Objects.requireNonNull(entityClass, "entityClass");
+        requireValidId(id, entityClass.getSimpleName());
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(entityClass.getSimpleName() + " not found with id: " + id));
     }
 
+    /**
+     * Renvoie l'entité si elle existe, sinon null. Ne lève pas si absente.
+     */
+    public static <T> T findStrictByIdOrNull(JpaRepository<T, Long> repository, Long id, Class<T> entityClass) {
+        Objects.requireNonNull(repository, "repository");
+        Objects.requireNonNull(entityClass, "entityClass");
+        if (id == null) return null;
+        if (id <= 0) return null; // on ignore silencieusement les id invalides ici
+        return repository.findById(id).orElse(null);
+    }
 
-
-    public static <T, D> T findOrUpdate(
-            JpaRepository<T, Long> repository,
-            D dto,
-            Class<T> entityClass,
-            Function<T, Boolean> matchCriteria,
-            BiConsumer<T, D> fieldUpdater
-    ) {
-        Objects.requireNonNull(repository, "Repository cannot be null");
-        Objects.requireNonNull(dto, "DTO cannot be null");
-        Objects.requireNonNull(entityClass, "Entity class cannot be null");
-        Objects.requireNonNull(matchCriteria, "Match criteria cannot be null");
-
-        BeanWrapper dtoWrapper = new BeanWrapperImpl(dto);
-
-        // ✅ 1. Check if DTO has ID
-        Object idValue = dtoWrapper.getPropertyValue("id");
-        if (idValue instanceof Long id && id > 0) {
-            return repository.findById(id)
-                    .map(existing -> {
-                        if (fieldUpdater != null) fieldUpdater.accept(existing, dto);
-                        return repository.save(existing);
-                    })
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            entityClass.getSimpleName() + " not found with ID: " + id
-                    ));
+    /**
+     * Retourne une référence proxy (getReference) sans SELECT immédiat.
+     * Lève IllegalArgumentException si id invalide. Peut lever EntityNotFoundException
+     * plus tard lorsque l'entité est accédée (comportement dépendant du provider JPA).
+     */
+    public static <T> T getReferenceStrict(EntityManager em, Class<T> entityClass, Long id) {
+        Objects.requireNonNull(em, "entityManager");
+        Objects.requireNonNull(entityClass, "entityClass");
+        requireValidId(id, entityClass.getSimpleName());
+        try {
+            return em.getReference(entityClass, id);
+        } catch (EntityNotFoundException ex) {
+            throw new EntityNotFoundException(entityClass.getSimpleName() + " not found with id: " + id);
         }
+    }
 
-        // ✅ 2. Fallback: search by business key if no ID
-        Optional<T> optional = repository.findAll().stream()
-                .filter(e -> {
-                    try {
-                        return matchCriteria.apply(e);
-                    } catch (Exception ex) {
-                        return false;
-                    }
-                })
-                .findFirst();
+    /* ------------------------------------------------------------------ */
+    /*  Mise à jour                                                     */
+    /* ------------------------------------------------------------------ */
 
-        if (optional.isPresent()) {
-            T entity = optional.get();
-            if (fieldUpdater != null) fieldUpdater.accept(entity, dto);
+    /**
+     * Charge l'entité par ID, applique un Consumer de mise à jour, puis persiste.
+     * Si fieldUpdater est null, renvoie simplement l'entité trouvée (sans save).
+     */
+    public static <T> T updateStrictById(
+            JpaRepository<T, Long> repository,
+            Long id,
+            Class<T> entityClass,
+            Consumer<T> fieldUpdater
+    ) {
+        T entity = findStrictById(repository, id, entityClass);
+        if (fieldUpdater != null) {
+            fieldUpdater.accept(entity);
             return repository.save(entity);
         }
-
-        // ✅ 3. Prevent creating empty entity
-        if (isDtoEmpty(dto)) {
-            throw new IllegalArgumentException("DTO has no ID and no valid data to create a new entity");
-        }
-
-        // ✅ 4. Create new entity
-        try {
-            T newEntity = entityClass.getDeclaredConstructor().newInstance();
-            if (fieldUpdater != null) fieldUpdater.accept(newEntity, dto);
-            return repository.save(newEntity);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create new entity: " + entityClass.getSimpleName(), e);
-        }
+        return entity;
     }
 
-    // ✅ Utility: Check if DTO fields are all null (except ID)
-    private static boolean isDtoEmpty(Object dto) {
-        BeanWrapper wrapper = new BeanWrapperImpl(dto);
-        for (PropertyDescriptor pd : wrapper.getPropertyDescriptors()) {
-            String name = pd.getName();
-            if (!"class".equals(name) && !"id".equals(name)) {
-                Object value = wrapper.getPropertyValue(name);
-                if (value != null) return false;
-            }
-        }
-        return true;
+    /* ------------------------------------------------------------------ */
+    /*  Attachement optionnel                                            */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Charge ou renvoie null si id null/<=0 ou non trouvé. Ne lève pas.
+     * Pratique pour les relations optionnelles.
+     */
+    public static <T> T attachByIdOrNull(JpaRepository<T, Long> repository, Long id, Class<T> entityClass) {
+        Objects.requireNonNull(repository, "repository");
+        Objects.requireNonNull(entityClass, "entityClass");
+        if (id == null || id <= 0) return null;
+        return repository.findById(id).orElse(null);
     }
-
-
-
 }

@@ -18,10 +18,10 @@ public class MentionUE implements GenericEntity<MentionUE> {
     private boolean archive;
 
     @ManyToOne
-    @JoinColumn(name = "mention", referencedColumnName = "id")
+    @JoinColumn(name = "mention_id", nullable = false)
     private Mention mention;
     @ManyToOne
-    @JoinColumn(name = "ue", referencedColumnName = "id")
+    @JoinColumn(name = "ue_id",nullable = false)
     @JsonIgnore
     private UE ue;
 

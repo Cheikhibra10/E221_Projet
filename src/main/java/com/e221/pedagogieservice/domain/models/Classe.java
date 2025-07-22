@@ -20,16 +20,14 @@ public class Classe implements GenericEntity<Classe> {
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
     @ManyToOne
-    @JoinColumn(name = "domaine", referencedColumnName = "id")
+    @JoinColumn(name = "domaine_id", nullable = false)
     private Domaine domaine;
     @ManyToOne
-    @JoinColumn(name = "niveau", referencedColumnName = "id")
+    @JoinColumn(name = "niveau_id", nullable = false)
     private Niveau niveau;
     @ManyToOne
-    @JoinColumn(name = "specialite", referencedColumnName = "id")
+    @JoinColumn(name = "specialite_id", nullable = false)
     private Specialite specialite;
-
-
 
     @Override
     public Classe createNewInstance() {

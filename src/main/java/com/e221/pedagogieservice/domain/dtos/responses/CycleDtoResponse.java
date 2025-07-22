@@ -14,5 +14,5 @@ public class CycleDtoResponse {
     private String duree;
     private int taux_horaire;
     private Statut statut;
-    private Boolean archive;
+    private boolean archive;
 }

@@ -21,11 +21,11 @@ public class DocumentParNiveau implements GenericEntity<DocumentParNiveau> {
     private boolean archive;
 
     @ManyToOne
-    @JoinColumn(name = "document", referencedColumnName = "id")
+    @JoinColumn(name = "document_id", nullable = false)
     @JsonIgnore
     private Document document;
     @ManyToOne
-    @JoinColumn(name = "niveau", referencedColumnName = "id")
+    @JoinColumn(name = "niveau_id", nullable = false)
     private Niveau niveau;
 
     @Override

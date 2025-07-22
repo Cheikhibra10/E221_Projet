@@ -64,32 +64,23 @@ public class OuvertureServiceImp
 
     @Override
     protected Ouverture createRelationships(Ouverture ouverture, OuvertureDtoRequest dto) {
-        if (dto.getAnneeScolaire() != null) {
-            AnneeScolaire anneeScolaire = DomainEntityHelper.findOrCreateStrict(
-                    anneeScolaireRepository,
-                    dto.getAnneeScolaire(),
-                    AnneeScolaire.class,
-                    root -> root.get("libelle").in(dto.getAnneeScolaire().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        if (dto.getAnneeScolaireId() != null) {
+            if (dto.getAnneeScolaireId() > 0) {
+            AnneeScolaire anneeScolaire = DomainEntityHelper.findStrictById(anneeScolaireRepository, dto.getAnneeScolaireId(), AnneeScolaire.class);
             ouverture.setAnneeScolaire(anneeScolaire);
+        } else {
+            ouverture.setAnneeScolaire(null);
+        }
         }
         return ouverture;
     }
     // 🔗 Relations
     @Override
     protected Ouverture updateRelationships(Ouverture ouverture, OuvertureDtoRequest dto) {
-        if (dto.getAnneeScolaire() != null) {
-            AnneeScolaire anneeScolaire = DomainEntityHelper.findOrUpdate(
-                    anneeScolaireRepository,
-                    dto.getAnneeScolaire(),
-                    AnneeScolaire.class,
-                    existing -> existing.getLibelle().equalsIgnoreCase(dto.getAnneeScolaire().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
+        if (dto.getAnneeScolaireId() != null) {
+            AnneeScolaire anneeScolaire = DomainEntityHelper.findStrictById(anneeScolaireRepository, dto.getAnneeScolaireId(), AnneeScolaire.class);
             ouverture.setAnneeScolaire(anneeScolaire);
-        }else{
+        } else {
             ouverture.setAnneeScolaire(null);
         }
         return ouverture;

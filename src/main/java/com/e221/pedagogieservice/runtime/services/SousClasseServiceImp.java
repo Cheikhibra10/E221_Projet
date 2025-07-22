@@ -4,6 +4,7 @@ import com.cheikh.commun.services.MapperService;
 import com.e221.pedagogieservice.domain.dtos.requests.SousClasseDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.responses.SousClasseDtoResponse;
 import com.e221.pedagogieservice.domain.models.Classe;
+import com.e221.pedagogieservice.domain.models.Niveau;
 import com.e221.pedagogieservice.domain.models.SousClasse;
 import com.e221.pedagogieservice.domain.repositories.ClasseRepository;
 import com.e221.pedagogieservice.domain.repositories.SousClasseRepository;
@@ -45,31 +46,25 @@ public class SousClasseServiceImp
 
     @Override
     protected SousClasse createRelationships(SousClasse sousClasse, SousClasseDtoRequest dto) {
-        if (dto.getClasse() != null) {
-            Classe classe = DomainEntityHelper.findOrCreateStrict(
-                    classeRepository,
-                    dto.getClasse(),
-                    Classe.class,
-                    root -> root.get("libelle").in(dto.getClasse().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        if (dto.getClasseId() != null) {
+            Classe classe = DomainEntityHelper.findStrictById(classeRepository, dto.getClasseId(), Classe.class);
             sousClasse.setClasse(classe);
+        } else {
+            sousClasse.setClasse(null);
         }
         return sousClasse;
     }
 
     @Override
     protected SousClasse updateRelationships(SousClasse sousClasse, SousClasseDtoRequest dto) {
-        if (dto.getClasse() != null) {
-            Classe classe = DomainEntityHelper.findOrUpdate(
-                    classeRepository,
-                    dto.getClasse(),
-                    Classe.class,
-                    existing-> existing.getLibelle().equalsIgnoreCase(dto.getClasse().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
-            sousClasse.setClasse(classe);
+        if (dto.getClasseId() != null) {
+            if(dto.getClasseId() > 0){
+                Classe classe = DomainEntityHelper.findStrictById(classeRepository, dto.getClasseId(), Classe.class);
+                sousClasse.setClasse(classe);
+            } else {
+                sousClasse.setClasse(null);
+            }
+
         }
         return sousClasse;
     }

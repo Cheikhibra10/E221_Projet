@@ -1,5 +1,6 @@
 package com.e221.pedagogieservice.domain.dtos.requests;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -16,5 +17,5 @@ public class PaysDtoRequest {
     @Size(min = 2, max = 100, message = "Le libellé doit contenir entre 2 et 100 caractères.")
     private String libelle;
 
-    private Boolean archive;
-}
+    @Column(nullable = false)
+    private boolean archive;}

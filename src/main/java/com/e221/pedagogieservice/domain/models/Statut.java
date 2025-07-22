@@ -9,5 +9,7 @@ public enum Statut {
     Inactif,
     Indisponible,
     Disponible,
-    En_attente
+    En_attente,
+    A_ramener,
+    A_retirer
 }

@@ -23,10 +23,10 @@ public class Specialite implements GenericEntity<Specialite> {
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
     @ManyToOne
-    @JoinColumn(name = "mention", referencedColumnName = "id")
+    @JoinColumn(name = "mention_id", nullable = false)
     private Mention mention;
     @ManyToOne
-    @JoinColumn(name = "domaine", referencedColumnName = "id")
+    @JoinColumn(name = "domaine_id", nullable = false)
     private Domaine domaine;
     @OneToMany(mappedBy = "specialite", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NiveauSpecialite> niveauxSpecialites = new ArrayList<>();

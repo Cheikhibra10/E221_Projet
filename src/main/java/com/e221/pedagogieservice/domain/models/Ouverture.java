@@ -28,7 +28,7 @@ public class Ouverture implements GenericEntity<Ouverture> {
     private boolean archive;
 
     @ManyToOne
-    @JoinColumn(name = "anneeScolaire", referencedColumnName = "id")
+    @JoinColumn(name = "anneeScolaire_id", nullable = false)
     private AnneeScolaire anneeScolaire;
 
     @Override

@@ -1,6 +1,7 @@
 package com.e221.pedagogieservice.domain.dtos.requests;
 
 import com.e221.pedagogieservice.domain.models.Statut;
+import jakarta.persistence.Column;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
@@ -20,18 +21,17 @@ public class ClasseDtoRequest {
     private String libelle;
     private String code;
     private Statut statut;
-    @NotNull(message = "Le champ 'archive' est obligatoire.")
-    private Boolean archive;
+    private boolean archive;
 
     @Valid
     @NotNull(message = "La domaine est obligatoire.")
-    private DomaineDtoRequest domaine;
+    private Long domaineId;
 
     @Valid
     @NotNull(message = "Le niveau est obligatoire.")
-    private NiveauDtoRequest niveau;
+    private Long niveauId;
 
     @Valid
     @NotNull(message = "La spécialité est obligatoire.")
-    private SpecialiteDtoRequest specialite;
+    private Long specialiteId;
 }

@@ -1,6 +1,7 @@
 package com.e221.pedagogieservice.domain.dtos.requests;
 
 import com.e221.pedagogieservice.domain.models.Statut;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
 import lombok.*;
@@ -20,6 +21,7 @@ public class CycleDtoRequest {
     private String duree;
     private int taux_horaire;
     private Statut statut;
-    @NotNull(message = "Le champ 'archive' est obligatoire.")
-    private Boolean archive;
+    private boolean archive;
+
+
 }

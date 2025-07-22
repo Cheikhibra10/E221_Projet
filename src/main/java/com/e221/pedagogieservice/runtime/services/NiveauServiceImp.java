@@ -46,34 +46,31 @@ public class NiveauServiceImp
 
     @Override
     protected Niveau createRelationships(Niveau niveau, NiveauDtoRequest dto) {
-        if (dto.getCycle() != null) {
-            Cycle cycle = DomainEntityHelper.findOrCreateStrict(
-                    cycleRepository,
-                    dto.getCycle(),
-                    Cycle.class,
-                    root -> root.get("libelle").in(dto.getCycle().getCycle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        if (dto.getCycleId() != null) {
+            Cycle cycle = DomainEntityHelper.findStrictById(cycleRepository, dto.getCycleId(), Cycle.class);
             niveau.setCycle(cycle);
+        } else {
+            niveau.setCycle(null);
         }
         return niveau;
     }
 
     @Override
     protected Niveau updateRelationships(Niveau niveau, NiveauDtoRequest dto) {
-        if (dto.getCycle() != null) {
-            Cycle cycle = DomainEntityHelper.findOrUpdate(
-                    cycleRepository,
-                    dto.getCycle(),
-                    Cycle.class,
-                    existingCycle-> existingCycle.getCycle().equalsIgnoreCase(dto.getCycle().getCycle()),
-                    MapperService::patchEntityFromDto
-            );
-            niveau.setCycle(cycle);
+        if (dto.getCycleId() != null) {
+            // cycleId fourni dans la requête
+            if (dto.getCycleId() > 0) {
+                Cycle cycle = DomainEntityHelper.findStrictById(cycleRepository, dto.getCycleId(), Cycle.class);
+                niveau.setCycle(cycle);
+            } else {
+                // Si 0 ou négatif → détacher cycle
+                niveau.setCycle(null);
+            }
         }
+        // Si cycleId est null -> on ne touche pas au cycle existant
         return niveau;
     }
+
 
     // ✅ Archive avec éviction
     @Override

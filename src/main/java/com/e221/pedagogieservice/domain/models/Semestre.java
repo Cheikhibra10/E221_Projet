@@ -20,7 +20,7 @@ public class Semestre implements GenericEntity<Semestre> {
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
     @ManyToOne
-    @JoinColumn(name = "niveau", referencedColumnName = "id")
+    @JoinColumn(name = "niveau_id", nullable = false)
     private Niveau niveau;
     @Override
     public Semestre createNewInstance() {

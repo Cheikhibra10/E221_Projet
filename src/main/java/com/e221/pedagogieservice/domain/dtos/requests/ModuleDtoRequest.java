@@ -2,6 +2,7 @@ package com.e221.pedagogieservice.domain.dtos.requests;
 
 import com.e221.pedagogieservice.domain.models.Statut;
 import com.e221.pedagogieservice.domain.models.UE;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
 import lombok.*;
@@ -24,11 +25,7 @@ public class ModuleDtoRequest {
     @NotBlank(message = "Le libellé du module est obligatoire.")
     @Size(min = 2, max = 100, message = "Le libellé doit contenir entre 2 et 100 caractères.")
     private String libelle;
-
-    @NotNull(message = "Le champ état est obligatoire.")
     private Statut statut;
-
-    @NotNull(message = "Le champ archive est obligatoire.")
-    private Boolean archive;
-    private List<UeDtoRequest> ues;
+    private boolean archive;
+    private List<Long> ues;
 }

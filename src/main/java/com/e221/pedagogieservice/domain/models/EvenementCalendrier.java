@@ -26,15 +26,15 @@ public class EvenementCalendrier implements GenericEntity<EvenementCalendrier> {
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
     @ManyToOne
-    @JoinColumn(name = "calendrier_id", referencedColumnName = "id")
+    @JoinColumn(name = "calendrier_id", nullable = false)
     @JsonIgnore
     private Calendrier calendrier;
     @ManyToOne
-    @JoinColumn(name = "evenement_id", referencedColumnName = "id")
+    @JoinColumn(name = "evenement_id", nullable = false)
     private Evenement evenement;
 
     @ManyToOne
-    @JoinColumn(name = "semestre", referencedColumnName = "id")
+    @JoinColumn(name = "semestre_id", nullable = false)
     private Semestre semestre;
 
     @Override

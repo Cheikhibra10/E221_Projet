@@ -20,7 +20,7 @@ public class Mention implements GenericEntity<Mention> {
     private boolean archive;
 
     @ManyToOne
-    @JoinColumn(name = "domaine", referencedColumnName = "id")
+    @JoinColumn(name = "domaine_id", nullable = false)
     private Domaine domaine;
 
     @Override

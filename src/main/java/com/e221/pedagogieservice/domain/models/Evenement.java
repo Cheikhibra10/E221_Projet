@@ -1,6 +1,7 @@
 package com.e221.pedagogieservice.domain.models;
 
 import com.cheikh.commun.core.GenericEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,11 +21,14 @@ public class Evenement implements GenericEntity<Evenement> {
     private String libelle;
     @Enumerated(EnumType.STRING)
     private Statut statut;
+    @Column(columnDefinition = "boolean default false")
+    @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
+    private boolean archive;
     @ManyToOne
-    @JoinColumn(name = "semestre", referencedColumnName = "id")
+    @JoinColumn(name = "semestre_id", nullable = false)
     private Semestre semestre;
     @ManyToOne
-    @JoinColumn(name = "niveau", referencedColumnName = "id")
+    @JoinColumn(name = "niveau_id", nullable = false)
     private Niveau niveau;
     @Override
     public Evenement createNewInstance() {

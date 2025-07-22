@@ -19,10 +19,10 @@ public class ModuleUE implements GenericEntity<ModuleUE> {
     private boolean archive;
 
     @ManyToOne
-    @JoinColumn(name = "ue", referencedColumnName = "id")
+    @JoinColumn(name = "ue_id", nullable = false)
     private UE ue;
     @ManyToOne
-    @JoinColumn(name = "module", referencedColumnName = "id")
+    @JoinColumn(name = "module_id", nullable = false)
     @JsonIgnore
     private Module module;
 

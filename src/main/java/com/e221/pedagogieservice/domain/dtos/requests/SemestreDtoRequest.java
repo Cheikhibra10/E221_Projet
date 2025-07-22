@@ -2,6 +2,7 @@ package com.e221.pedagogieservice.domain.dtos.requests;
 
 import com.e221.pedagogieservice.domain.models.Niveau;
 import com.e221.pedagogieservice.domain.models.Statut;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -19,7 +20,7 @@ public class SemestreDtoRequest {
     private String libelle;
     private String duree;
     private Statut statut;
-    private Boolean archive;
-    private NiveauDtoRequest niveau;
+    private boolean archive;
+    private Long niveauId;
 
 }

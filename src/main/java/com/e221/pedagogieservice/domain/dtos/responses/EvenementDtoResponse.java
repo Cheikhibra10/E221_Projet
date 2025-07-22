@@ -16,7 +16,6 @@ import java.util.Date;
 public class EvenementDtoResponse {
     private Long id;
     private String libelle;
-
     private Statut statut;
     private SemestreDtoResponse semestre;
     private NiveauDtoResponse niveau;

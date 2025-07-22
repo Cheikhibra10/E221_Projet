@@ -3,6 +3,7 @@ package com.e221.pedagogieservice.domain.dtos.requests;
 import com.e221.pedagogieservice.domain.models.Niveau;
 import com.e221.pedagogieservice.domain.models.Statut;
 import com.e221.pedagogieservice.domain.models.TypeDocument;
+import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 
@@ -19,5 +20,5 @@ public class DocumentDtoRequest {
     private Statut statut;
     private TypeDocument typeDocument;
     private boolean archive;
-    private List<NiveauDtoRequest> niveaux;
+    private List<Long> niveaux;
 }

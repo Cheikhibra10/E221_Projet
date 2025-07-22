@@ -21,10 +21,10 @@ public class SousClasse implements GenericEntity<SousClasse> {
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
     @ManyToOne
-    @JoinColumn(name = "classe", referencedColumnName = "id")
+    @JoinColumn(name = "classe_id", nullable = false)
     private Classe classe;
     @ManyToOne
-    @JoinColumn(name = "semestre", referencedColumnName = "id")
+    @JoinColumn(name = "semestre_id", nullable = false)
     private Semestre semestre;
 
     @Override

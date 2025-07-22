@@ -13,10 +13,10 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface AnneeMapper {
-    AnneeScolaireDtoResponse toAnneeDtoResponse(AnneeScolaire anneeScolaire);
-    AnneeScolaire toAnneeScolaire(AnneeScolaireDtoRequest anneeScolaireDtoRequest);
-    EvenementDtoResponse toEvenementDtoResponse(Evenement evenement);
-    Evenement toEvenement(EvenementDtoRequest evenementDtoRequest);
-    OuvertureDtoResponse toOuvertureDtoResponse(Ouverture ouverture);
-    Ouverture toOuverture(OuvertureDtoRequest ouvertureDtoRequest);
+//    AnneeScolaireDtoResponse toAnneeDtoResponse(AnneeScolaire anneeScolaire);
+//    AnneeScolaire toAnneeScolaire(AnneeScolaireDtoRequest anneeScolaireDtoRequest);
+//    EvenementDtoResponse toEvenementDtoResponse(Evenement evenement);
+//    Evenement toEvenement(EvenementDtoRequest evenementDtoRequest);
+//    OuvertureDtoResponse toOuvertureDtoResponse(Ouverture ouverture);
+//    Ouverture toOuverture(OuvertureDtoRequest ouvertureDtoRequest);
 }

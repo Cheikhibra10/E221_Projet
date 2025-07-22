@@ -77,9 +77,9 @@ public class DocumentServiceImp extends DefaultServiceImp<Document, DocumentDtoR
     protected Document createRelationships(Document document, DocumentDtoRequest dto) {
         if (dto.getNiveaux() != null && !dto.getNiveaux().isEmpty()) {
             List<DocumentParNiveau> links = dto.getNiveaux().stream()
-                    .map(niveauDto -> {
-                        Niveau niveau = niveauRepository.findById(niveauDto.getId())
-                                .orElseThrow(() -> new EntityNotFoundException("Niveau not found id=" + niveauDto.getId()));
+                    .map(niveauId -> {
+                        Niveau niveau = niveauRepository.findById(niveauId)
+                                .orElseThrow(() -> new EntityNotFoundException("niveau not found id=" + niveauId));
                         DocumentParNiveau ns = new DocumentParNiveau();
                         ns.setDocument(document);
                         ns.setNiveau(niveau);
@@ -98,9 +98,9 @@ public class DocumentServiceImp extends DefaultServiceImp<Document, DocumentDtoR
             doc.getDocumentParNiveaux().clear();
             if (!dto.getNiveaux().isEmpty()) {
                 List<DocumentParNiveau> links = dto.getNiveaux().stream()
-                        .map(nivDto -> {
-                            Niveau niveau = niveauRepository.findById(nivDto.getId())
-                                    .orElseThrow(() -> new EntityNotFoundException("Niveau not found id=" + nivDto.getId()));
+                        .map(niveauId -> {
+                            Niveau niveau = niveauRepository.findById(niveauId)
+                                    .orElseThrow(() -> new EntityNotFoundException("Niveau not found id=" + niveauId));
                             DocumentParNiveau l = new DocumentParNiveau();
                             l.setDocument(doc);
                             l.setNiveau(niveau);

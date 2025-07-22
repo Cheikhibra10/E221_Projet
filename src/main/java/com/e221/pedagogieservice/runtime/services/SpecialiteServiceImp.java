@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @Slf4j
-public class SpecialiteServiceImp
+public class    SpecialiteServiceImp
         extends DefaultServiceImp<Specialite, SpecialiteDtoRequest, SpecialiteDtoResponse>
         implements SpecialiteService {
 
@@ -121,37 +121,27 @@ public class SpecialiteServiceImp
     @Override
     protected Specialite createRelationships(Specialite specialite, SpecialiteDtoRequest dto) {
         // Mention
-        if (dto.getMention() != null) {
-            Mention mention = DomainEntityHelper.findOrCreateStrict(
-                    mentionRepository,
-                    dto.getMention(),
-                    Mention.class,
-                    root -> root.get("libelle").in(dto.getMention().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        if (dto.getMentionId() != null) {
+            Mention mention = DomainEntityHelper.findStrictById(mentionRepository, dto.getMentionId(), Mention.class);
             specialite.setMention(mention);
+        } else {
+            specialite.setMention(null);
         }
 
         // Domaine
-        if (dto.getDomaine() != null) {
-            Domaine domaine = DomainEntityHelper.findOrCreateStrict(
-                    domaineRepository,
-                    dto.getDomaine(),
-                    Domaine.class,
-                    root -> root.get("libelle").in(dto.getDomaine().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        if (dto.getDomaineId() != null) {
+            Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, dto.getDomaineId(), Domaine.class);
             specialite.setDomaine(domaine);
+        } else {
+            specialite.setDomaine(null);
         }
 
         // Niveaux via join entity
         if (dto.getNiveaux() != null && !dto.getNiveaux().isEmpty()) {
             List<NiveauSpecialite> links = dto.getNiveaux().stream()
-                    .map(niveauDto -> {
-                        Niveau niveau = niveauRepository.findById(niveauDto.getId())
-                                .orElseThrow(() -> new EntityNotFoundException("Niveau not found id=" + niveauDto.getId()));
+                    .map(niveauId -> {
+                        Niveau niveau = niveauRepository.findById(niveauId)
+                                .orElseThrow(() -> new EntityNotFoundException("Niveau not found id=" +niveauId));
                         NiveauSpecialite ns = new NiveauSpecialite();
                         ns.setSpecialite(specialite);
                         ns.setNiveau(niveau);
@@ -170,47 +160,30 @@ public class SpecialiteServiceImp
     @Override
     protected Specialite updateRelationships(Specialite specialite, SpecialiteDtoRequest dto) {
         // Mention
-        if (dto.getMention() != null) {
-            Mention mention = DomainEntityHelper.findOrUpdate(
-                    mentionRepository,
-                    dto.getMention(),
-                    Mention.class,
-                    existing -> {
-                        String dtoLib = dto.getMention().getLibelle();
-                        return dtoLib != null &&
-                                existing.getLibelle() != null &&
-                                existing.getLibelle().equalsIgnoreCase(dtoLib);
-                    },
-                    MapperService::patchEntityFromDto
-            );
+        if (dto.getMentionId() != null) {
+            Mention mention = DomainEntityHelper.findStrictById(mentionRepository, dto.getMentionId(), Mention.class);
             specialite.setMention(mention);
+        } else {
+            specialite.setMention(null);
         }
 
         // Domaine
-        if (dto.getDomaine() != null) {
-            Domaine domaine = DomainEntityHelper.findOrUpdate(
-                    domaineRepository,
-                    dto.getDomaine(),
-                    Domaine.class,
-                    existing -> {
-                        String dtoLib = dto.getDomaine().getLibelle();
-                        return dtoLib != null &&
-                                existing.getLibelle() != null &&
-                                existing.getLibelle().equalsIgnoreCase(dtoLib);
-                    },
-                    MapperService::patchEntityFromDto
-            );
+        if (dto.getDomaineId() != null) {
+            Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, dto.getDomaineId(), Domaine.class);
             specialite.setDomaine(domaine);
+        } else {
+            specialite.setDomaine(null);
         }
+
 
         // Niveaux join rebuild
         if (dto.getNiveaux() != null) {          // only if caller included the field
             specialite.getNiveauxSpecialites().clear();
             if (!dto.getNiveaux().isEmpty()) {
                 List<NiveauSpecialite> links = dto.getNiveaux().stream()
-                        .map(nivDto -> {
-                            Niveau niveau = niveauRepository.findById(nivDto.getId())
-                                    .orElseThrow(() -> new EntityNotFoundException("Niveau not found id=" + nivDto.getId()));
+                        .map(niveauId -> {
+                            Niveau niveau = niveauRepository.findById(niveauId)
+                                    .orElseThrow(() -> new EntityNotFoundException("Niveau not found id=" + niveauId));
                             NiveauSpecialite ns = new NiveauSpecialite();
                             ns.setSpecialite(specialite);
                             ns.setNiveau(niveau);

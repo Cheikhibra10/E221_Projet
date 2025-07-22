@@ -22,10 +22,8 @@ public class EvenementCalendrierDto {
 
 
 
-    @NotNull(message = "Le statut est obligatoire.")
     private Statut statut;
 
-    @NotNull(message = "Le champ archive est obligatoire.")
     private Boolean archive;
 
     @NotNull(message = "L'identifiant du calendrier est obligatoire.")

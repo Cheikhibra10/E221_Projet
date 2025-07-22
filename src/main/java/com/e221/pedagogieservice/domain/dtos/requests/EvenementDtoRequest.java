@@ -20,10 +20,9 @@ public class EvenementDtoRequest {
     @NotBlank(message = "Le libellé est obligatoire.")
     @Size(min = 2, max = 100, message = "Le libellé doit contenir entre 2 et 100 caractères.")
     private String libelle;
-    @NotNull(message = "Le statut est obligatoire.")
     private Statut statut;
     @NotNull(message = "Le semestre est obligatoire.")
-    private SemestreDtoRequest semestre;
+    private Long semestreId;
     @NotNull(message = "Le niveau est obligatoire.")
-    private NiveauDtoRequest niveau;
+    private Long niveauId;
 }

@@ -22,7 +22,7 @@ public class Niveau implements GenericEntity<Niveau> {
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
     @ManyToOne
-    @JoinColumn(name = "cycle", referencedColumnName = "id")
+    @JoinColumn(name = "cycle_id", nullable = false)
     private Cycle cycle;
     @Override
     public Niveau createNewInstance() {

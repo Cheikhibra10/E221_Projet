@@ -3,17 +3,13 @@ package com.e221.pedagogieservice.runtime.services;
 import com.cheikh.commun.exceptions.EntityNotFoundException;
 import com.cheikh.commun.services.MapperService;
 import com.e221.pedagogieservice.domain.dtos.requests.ModuleDtoRequest;
-import com.e221.pedagogieservice.domain.dtos.requests.UeDtoRequest;
-import com.e221.pedagogieservice.domain.dtos.responses.MentionDtoResponse;
 import com.e221.pedagogieservice.domain.dtos.responses.ModuleDtoResponse;
-import com.e221.pedagogieservice.domain.dtos.responses.SpecialiteDtoResponse;
 import com.e221.pedagogieservice.domain.dtos.responses.UeDtoResponse;
 import com.e221.pedagogieservice.domain.models.*;
 import com.e221.pedagogieservice.domain.models.Module;
 import com.e221.pedagogieservice.domain.repositories.ModuleRepository;
 import com.e221.pedagogieservice.domain.repositories.UeRepository;
 import com.e221.pedagogieservice.domain.services.ModuleService;
-import com.e221.pedagogieservice.domain.utils.DomainEntityHelper;
 import com.e221.pedagogieservice.runtime.config.CacheNameProvider;
 import com.e221.pedagogieservice.runtime.services.base.DefaultServiceImp;
 import com.e221.pedagogieservice.runtime.specifications.DefaultSpecification;
@@ -21,9 +17,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -72,13 +65,13 @@ public class ModuleServiceImp extends DefaultServiceImp<Module, ModuleDtoRequest
     protected Module createRelationships(Module module, ModuleDtoRequest dto) {
         if (dto.getUes() != null && !dto.getUes().isEmpty()) {
             List<ModuleUE> links = dto.getUes().stream()
-                    .map(ueDto -> {
-                        UE ue = ueRepository.findById(ueDto.getId())
-                                .orElseThrow(() -> new EntityNotFoundException("UE not found id=" + ueDto.getId()));
-                        ModuleUE md = new ModuleUE();
-                        md.setModule(module);
-                        md.setUe(ue);
-                        return md;
+                    .map(ueId -> {
+                        UE ue = ueRepository.findById(ueId)
+                                .orElseThrow(() -> new EntityNotFoundException("ue not found id=" + ueId));
+                        ModuleUE ns = new ModuleUE();
+                        ns.setModule(module);
+                        ns.setUe(ue);
+                        return ns;
                     })
                     .toList();
             module.getModuleUES().addAll(links);
@@ -92,9 +85,9 @@ public class ModuleServiceImp extends DefaultServiceImp<Module, ModuleDtoRequest
             module.getModuleUES().clear();
             if (!dto.getUes().isEmpty()) {
                 List<ModuleUE> links = dto.getUes().stream()
-                        .map(nivDto -> {
-                            UE ue = ueRepository.findById(nivDto.getId())
-                                    .orElseThrow(() -> new EntityNotFoundException("UE not found id=" + nivDto.getId()));
+                        .map(ueID -> {
+                            UE ue = ueRepository.findById(ueID)
+                                    .orElseThrow(() -> new EntityNotFoundException("UE not found id=" + ueID));
                             ModuleUE md = new ModuleUE();
                             md.setModule(module);
                             md.setUe(ue);

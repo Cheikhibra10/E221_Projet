@@ -15,7 +15,9 @@ public class Domaine implements GenericEntity<Domaine> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String libelle;
-    private boolean etat;
+    @Column(columnDefinition = "boolean default true")
+    @Schema(description = "etat 0 ou 1", defaultValue = "true", example = "true")
+    private boolean etat = true;
     @Column(columnDefinition = "boolean default false")
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;

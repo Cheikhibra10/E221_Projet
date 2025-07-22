@@ -51,33 +51,24 @@ public class SemestreServiceImp
 
     @Override
     protected Semestre createRelationships(Semestre semestre, SemestreDtoRequest dto) {
-        if (dto.getNiveau() != null) {
-            Niveau niveau = DomainEntityHelper.findOrCreateStrict(
-                    niveauRepository,
-                    dto.getNiveau(),
-                    Niveau.class,
-                    root -> root.get("libelle").in(dto.getNiveau().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        if (dto.getNiveauId() != null) {
+            Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
             semestre.setNiveau(niveau);
+        } else {
+            semestre.setNiveau(null);
         }
         return semestre;
     }
 
     @Override
     protected Semestre updateRelationships(Semestre semestre, SemestreDtoRequest dto) {
-        if (dto.getNiveau() != null) {
-            Niveau niveau = DomainEntityHelper.findOrUpdate(
-                    niveauRepository,
-                    dto.getNiveau(),
-                    Niveau.class,
-                    existingNiveau-> existingNiveau.getLibelle().equalsIgnoreCase(dto.getNiveau().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
-            semestre.setNiveau(niveau);
-        }else{
-            semestre.setNiveau(null);
+        if (dto.getNiveauId() != null) {
+            if (dto.getNiveauId() > 0){
+                Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
+                semestre.setNiveau(niveau);
+            } else {
+                semestre.setNiveau(null);
+            }
         }
         return semestre;
     }

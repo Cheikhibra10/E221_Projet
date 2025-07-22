@@ -95,35 +95,24 @@ public class CalendrierServiceImp extends DefaultServiceImp<Calendrier, Calendri
 
     @Override
     protected Calendrier createRelationships(Calendrier calendrier, CalendrierDtoRequest dto) {
-        if (dto.getNiveau() != null) {
-            Niveau niveau = DomainEntityHelper.findOrCreateStrict(
-                    niveauRepository,
-                    dto.getNiveau(),
-                    Niveau.class,
-                    root -> root.get("libelle").in(dto.getNiveau().getLibelle()), // ✅ dynamic predicate
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        // Niveau
+        if (dto.getNiveauId() != null) {
+            Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
             calendrier.setNiveau(niveau);
         }
 
-        if (dto.getSemestre() != null) {
-            Semestre semestre = DomainEntityHelper.findOrCreateStrict(
-                    semestreRepository,
-                    dto.getSemestre(),
-                    Semestre.class,
-                    root -> root.get("libelle").in(dto.getSemestre().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        // Semestre
+        if (dto.getSemestreId() != null) {
+            Semestre semestre = DomainEntityHelper.findStrictById(semestreRepository, dto.getSemestreId(), Semestre.class);
             calendrier.setSemestre(semestre);
         }
 
+        // Evenements
         if (dto.getEvenements() != null && !dto.getEvenements().isEmpty()) {
             List<EvenementCalendrier> links = dto.getEvenements().stream()
-                    .map(evenementDto -> {
-                        Evenement evenement = evenementRepository.findById(evenementDto.getId())
-                                .orElseThrow(() -> new EntityNotFoundException("Evenement not found id=" + evenementDto.getId()));
+                    .map(evenementId -> {
+                        Evenement evenement = evenementRepository.findById(evenementId)
+                                .orElseThrow(() -> new EntityNotFoundException("Evenement not found id=" + evenementId));
                         EvenementCalendrier ns = new EvenementCalendrier();
                         ns.setCalendrier(calendrier);
                         ns.setEvenement(evenement);
@@ -137,37 +126,33 @@ public class CalendrierServiceImp extends DefaultServiceImp<Calendrier, Calendri
     }
 
 
+
     @Override
     protected Calendrier updateRelationships(Calendrier calendrier, CalendrierDtoRequest dto) {
-        if (dto.getNiveau() != null) {
-            Niveau niveau = DomainEntityHelper.findOrUpdate(
-                    niveauRepository,
-                    dto.getNiveau(),
-                    Niveau.class,
-                    existing -> existing.getLibelle().equalsIgnoreCase(dto.getNiveau().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
+        // Niveau
+        if (dto.getNiveauId() != null) {
+            Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
             calendrier.setNiveau(niveau);
+        } else {
+            calendrier.setNiveau(null);
         }
 
-        if (dto.getSemestre() != null) {
-            Semestre semestre = DomainEntityHelper.findOrUpdate(
-                    semestreRepository,
-                    dto.getSemestre(),
-                    Semestre.class,
-                    existing -> existing.getLibelle().equalsIgnoreCase(dto.getSemestre().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
+        // Semestre
+        if (dto.getSemestreId() != null) {
+            Semestre semestre = DomainEntityHelper.findStrictById(semestreRepository, dto.getSemestreId(), Semestre.class);
             calendrier.setSemestre(semestre);
+        } else {
+            calendrier.setSemestre(null);
         }
 
-        if (dto.getEvenements() != null) {          // only if caller included the field
+        // Evenements
+        if (dto.getEvenements() != null) { // only if caller included the field
             calendrier.getEvenementCalendriers().clear();
             if (!dto.getEvenements().isEmpty()) {
                 List<EvenementCalendrier> links = dto.getEvenements().stream()
-                        .map(evenementDto -> {
-                            Evenement evenement = evenementRepository.findById(evenementDto.getId())
-                                    .orElseThrow(() -> new EntityNotFoundException("Evenement not found id=" + evenementDto.getId()));
+                        .map(evenementId -> {
+                            Evenement evenement = evenementRepository.findById(evenementId)
+                                    .orElseThrow(() -> new EntityNotFoundException("Evenement not found id=" + evenementId));
                             EvenementCalendrier ns = new EvenementCalendrier();
                             ns.setCalendrier(calendrier);
                             ns.setEvenement(evenement);
@@ -177,9 +162,9 @@ public class CalendrierServiceImp extends DefaultServiceImp<Calendrier, Calendri
                 calendrier.getEvenementCalendriers().addAll(links);
             }
         }
+
         return calendrier;
     }
-
 
 
     @Override

@@ -18,11 +18,11 @@ public class NiveauSpecialite implements GenericEntity<NiveauSpecialite> {
     private boolean archive;
 
     @ManyToOne
-    @JoinColumn(name = "niveau", referencedColumnName = "id")
+    @JoinColumn(name = "niveau_id", nullable = false)
     @JsonIgnore
     private Niveau niveau;
     @ManyToOne
-    @JoinColumn(name = "specialite", referencedColumnName = "id")
+    @JoinColumn(name = "specialite_id", nullable = false)
     @JsonIgnore
     private Specialite specialite;
 

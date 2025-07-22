@@ -19,10 +19,10 @@ public class SemestreNiveau implements GenericEntity<SemestreNiveau> {
     private boolean archive;
 
     @ManyToOne
-    @JoinColumn(name = "niveau", referencedColumnName = "id")
+    @JoinColumn(name = "niveau_id", nullable = false)
     private Niveau niveau;
     @ManyToOne
-    @JoinColumn(name = "semestre", referencedColumnName = "id")
+    @JoinColumn(name = "semestre_id", nullable = false)
     private Semestre semestre;
 
 

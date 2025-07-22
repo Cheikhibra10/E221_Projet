@@ -1,6 +1,7 @@
 package com.e221.pedagogieservice.domain.dtos.requests;
 
 import com.e221.pedagogieservice.domain.models.Statut;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -20,7 +21,6 @@ public class OuvertureDtoRequest {
     @Size(min = 3, max = 50, message = "Le libellé doit contenir entre 3 et 50 caractères.")
     private String libelle;
 
-    @NotNull(message = "Le statut est obligatoire.")
     private Statut statut;
 
     @NotNull(message = "La date de début est obligatoire.")
@@ -30,9 +30,7 @@ public class OuvertureDtoRequest {
     @NotNull(message = "La date de fin est obligatoire.")
     @FutureOrPresent(message = "La date de fin doit être aujourd’hui ou dans le futur.")
     private LocalDate dateFin;
-
-    private Boolean archive;
-
+    private boolean archive;
     @NotNull(message = "L'année scolaire est obligatoire.")
-    private AnneeScolaireDtoRequest anneeScolaire;
+    private Long anneeScolaireId;
 }

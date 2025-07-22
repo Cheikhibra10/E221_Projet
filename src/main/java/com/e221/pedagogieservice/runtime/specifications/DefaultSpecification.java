@@ -16,4 +16,15 @@ public class DefaultSpecification<T> {
         };
     }
 
+    public Specification<T> isArchiveTrue() {
+        return (root, query, cb) -> {
+            try {
+                root.get("archive"); // check if field exists
+                return cb.isTrue(root.get("archive"));
+            } catch (IllegalArgumentException e) {
+                return cb.conjunction(); // no filter if archive doesn't exist
+            }
+        };
+    }
+
 }

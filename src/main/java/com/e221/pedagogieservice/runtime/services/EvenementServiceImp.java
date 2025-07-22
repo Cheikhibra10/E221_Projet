@@ -54,27 +54,18 @@ public class EvenementServiceImp
 
     @Override
     protected Evenement createRelationships(Evenement evenement, EvenementDtoRequest dto) {
-        if (dto.getSemestre() != null) {
-            Semestre semestre = DomainEntityHelper.findOrCreateStrict(
-                    semestreRepository,
-                    dto.getSemestre(),
-                    Semestre.class,
-                    root -> root.get("libelle").in(dto.getSemestre().getLibelle()),
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+        if (dto.getSemestreId() != null) {
+            Semestre semestre = DomainEntityHelper.findStrictById(semestreRepository, dto.getSemestreId(), Semestre.class);
             evenement.setSemestre(semestre);
+        } else {
+            evenement.setNiveau(null);
         }
-        if (dto.getNiveau() != null) {
-            Niveau niveau = DomainEntityHelper.findOrCreateStrict(
-                    niveauRepository,
-                    dto.getNiveau(),
-                    Niveau.class,
-                    root -> root.get("libelle").in(dto.getNiveau().getLibelle()), // ✅ dynamic predicate
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+
+        if (dto.getNiveauId() != null) {
+            Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
             evenement.setNiveau(niveau);
+        } else {
+            evenement.setNiveau(null);
         }
 
         return evenement;
@@ -82,26 +73,18 @@ public class EvenementServiceImp
 
     @Override
     protected Evenement updateRelationships(Evenement evenement, EvenementDtoRequest dto) {
-        if (dto.getSemestre() != null) {
-            Semestre semestre = DomainEntityHelper.findOrUpdate(
-                    semestreRepository,
-                    dto.getSemestre(),
-                    Semestre.class,
-                    existingMention -> existingMention.getLibelle().equalsIgnoreCase(dto.getSemestre().getLibelle()),
-                    MapperService::patchEntityFromDto
-            );
+        if (dto.getSemestreId() != null) {
+            Semestre semestre = DomainEntityHelper.findStrictById(semestreRepository, dto.getSemestreId(), Semestre.class);
             evenement.setSemestre(semestre);
+        } else {
+            evenement.setNiveau(null);
         }
-        if (dto.getNiveau() != null) {
-            Niveau niveau = DomainEntityHelper.findOrCreateStrict(
-                    niveauRepository,
-                    dto.getNiveau(),
-                    Niveau.class,
-                    root -> root.get("libelle").in(dto.getNiveau().getLibelle()), // ✅ dynamic predicate
-                    MapperService::patchEntityFromDto,
-                    entityManager
-            );
+
+        if (dto.getNiveauId() != null) {
+            Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
             evenement.setNiveau(niveau);
+        } else {
+            evenement.setNiveau(null);
         }
 
         return evenement;
