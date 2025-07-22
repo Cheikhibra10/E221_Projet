@@ -159,25 +159,42 @@ public class    SpecialiteServiceImp
      * ------------------------------------------------------------------ */
     @Override
     protected Specialite updateRelationships(Specialite specialite, SpecialiteDtoRequest dto) {
-        // Mention
-        if (dto.getMentionId() != null) {
-            Mention mention = DomainEntityHelper.findStrictById(mentionRepository, dto.getMentionId(), Mention.class);
-            specialite.setMention(mention);
-        } else {
-            specialite.setMention(null);
-        }
 
-        // Domaine
+        // ----- Mention -----
+        if (dto.getMentionId() != null) {                 // champ présent dans la requête
+            if (dto.getMentionId() > 0) {
+                Mention mention = DomainEntityHelper.findStrictById(
+                        mentionRepository,
+                        dto.getMentionId(),
+                        Mention.class
+                );
+                specialite.setMention(mention);
+            } else {
+                // cycle explicitement détaché (id <= 0)
+                specialite.setMention(null);
+            }
+        }
+        // sinon: on conserve la mention existante
+
+
+        // ----- Domaine -----
         if (dto.getDomaineId() != null) {
-            Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, dto.getDomaineId(), Domaine.class);
-            specialite.setDomaine(domaine);
-        } else {
-            specialite.setDomaine(null);
+            if (dto.getDomaineId() > 0) {
+                Domaine domaine = DomainEntityHelper.findStrictById(
+                        domaineRepository,
+                        dto.getDomaineId(),
+                        Domaine.class
+                );
+                specialite.setDomaine(domaine);
+            } else {
+                specialite.setDomaine(null);
+            }
         }
+        // sinon: on conserve le domaine existant
 
 
-        // Niveaux join rebuild
-        if (dto.getNiveaux() != null) {          // only if caller included the field
+        // ----- Niveaux (collection de liaisons) -----
+        if (dto.getNiveaux() != null) {                   // champ présent dans la requête
             specialite.getNiveauxSpecialites().clear();
             if (!dto.getNiveaux().isEmpty()) {
                 List<NiveauSpecialite> links = dto.getNiveaux().stream()
@@ -193,8 +210,11 @@ public class    SpecialiteServiceImp
                 specialite.getNiveauxSpecialites().addAll(links);
             }
         }
+        // sinon: on laisse la collection telle quelle
+
         return specialite;
     }
+
 
     /* ------------------------------------------------------------------
      *  Helper: map entity → DTO incl. niveaux

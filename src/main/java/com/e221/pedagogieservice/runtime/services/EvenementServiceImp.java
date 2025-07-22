@@ -73,22 +73,29 @@ public class EvenementServiceImp
 
     @Override
     protected Evenement updateRelationships(Evenement evenement, EvenementDtoRequest dto) {
+        // Gestion du semestre
         if (dto.getSemestreId() != null) {
-            Semestre semestre = DomainEntityHelper.findStrictById(semestreRepository, dto.getSemestreId(), Semestre.class);
-            evenement.setSemestre(semestre);
-        } else {
-            evenement.setNiveau(null);
+            if (dto.getSemestreId() > 0) {
+                Semestre semestre = DomainEntityHelper.findStrictById(semestreRepository, dto.getSemestreId(), Semestre.class);
+                evenement.setSemestre(semestre);
+            } else {
+                evenement.setSemestre(null);
+            }
         }
 
+        // Gestion du niveau
         if (dto.getNiveauId() != null) {
-            Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
-            evenement.setNiveau(niveau);
-        } else {
-            evenement.setNiveau(null);
+            if (dto.getNiveauId() > 0) {
+                Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
+                evenement.setNiveau(niveau);
+            } else {
+                evenement.setNiveau(null);
+            }
         }
 
         return evenement;
     }
+
     @Override
     public EvenementDtoResponse archive(Long id) {
         return null;

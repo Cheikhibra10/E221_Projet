@@ -77,12 +77,23 @@ public class OuvertureServiceImp
     // 🔗 Relations
     @Override
     protected Ouverture updateRelationships(Ouverture ouverture, OuvertureDtoRequest dto) {
-        if (dto.getAnneeScolaireId() != null) {
-            AnneeScolaire anneeScolaire = DomainEntityHelper.findStrictById(anneeScolaireRepository, dto.getAnneeScolaireId(), AnneeScolaire.class);
-            ouverture.setAnneeScolaire(anneeScolaire);
-        } else {
-            ouverture.setAnneeScolaire(null);
+
+        if (dto.getAnneeScolaireId() != null) {   // champ présent dans la requête
+            if (dto.getAnneeScolaireId() > 0) {
+                AnneeScolaire anneeScolaire = DomainEntityHelper.findStrictById(
+                        anneeScolaireRepository,
+                        dto.getAnneeScolaireId(),
+                        AnneeScolaire.class
+                );
+                ouverture.setAnneeScolaire(anneeScolaire);
+            } else {
+                // id <= 0 → détachement
+                ouverture.setAnneeScolaire(null);
+            }
         }
+        // sinon: champ absent → on garde l'ancienne relation
+
         return ouverture;
     }
+
 }

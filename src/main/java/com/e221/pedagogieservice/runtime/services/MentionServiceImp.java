@@ -83,13 +83,16 @@ public class MentionServiceImp
     // 🔗 Gestion relation lors de la mise à jour
     @Override
     protected Mention updateRelationships(Mention mention, MentionDtoRequest dto) {
-        Long domaineId = dto.getDomaineId();
-        if (domaineId != null) {
-            Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, domaineId, Domaine.class);
-            mention.setDomaine(domaine);
-        } else {
-            mention.setDomaine(null);
+        if (dto.getDomaineId() != null) {
+            if (dto.getDomaineId() > 0) {
+                Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, dto.getDomaineId(), Domaine.class);
+                mention.setDomaine(domaine);
+            } else {
+                mention.setDomaine(null); // On supprime l'association si l'id est 0
+            }
         }
+        // Si domaineId == null, on garde le domaine existant
         return mention;
     }
+
 }

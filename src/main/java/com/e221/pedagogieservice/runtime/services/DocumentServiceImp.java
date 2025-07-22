@@ -93,26 +93,31 @@ public class DocumentServiceImp extends DefaultServiceImp<Document, DocumentDtoR
 
     @Override
     protected Document updateRelationships(Document doc, DocumentDtoRequest dto) {
-
-        if (dto.getNiveaux() != null) {          // only if caller included the field
+        // Si le champ "niveaux" est fourni dans le DTO
+        if (dto.getNiveaux() != null) {
+            // On supprime les anciens liens
             doc.getDocumentParNiveaux().clear();
+
+            // Si la liste n'est pas vide, on recrée les relations
             if (!dto.getNiveaux().isEmpty()) {
                 List<DocumentParNiveau> links = dto.getNiveaux().stream()
                         .map(niveauId -> {
                             Niveau niveau = niveauRepository.findById(niveauId)
                                     .orElseThrow(() -> new EntityNotFoundException("Niveau not found id=" + niveauId));
-                            DocumentParNiveau l = new DocumentParNiveau();
-                            l.setDocument(doc);
-                            l.setNiveau(niveau);
-                            return l;
+                            DocumentParNiveau link = new DocumentParNiveau();
+                            link.setDocument(doc);
+                            link.setNiveau(niveau);
+                            return link;
                         })
                         .toList();
+
                 doc.getDocumentParNiveaux().addAll(links);
             }
         }
 
         return doc;
     }
+
 
 
     @Override

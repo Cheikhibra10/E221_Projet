@@ -81,24 +81,26 @@ public class ModuleServiceImp extends DefaultServiceImp<Module, ModuleDtoRequest
 
     @Override
     protected Module updateRelationships(Module module, ModuleDtoRequest dto) {
-        if (dto.getUes() != null) {          // only if caller included the field
+        if (dto.getUes() != null) {  // Champ inclus dans la requête
             module.getModuleUES().clear();
             if (!dto.getUes().isEmpty()) {
                 List<ModuleUE> links = dto.getUes().stream()
-                        .map(ueID -> {
-                            UE ue = ueRepository.findById(ueID)
-                                    .orElseThrow(() -> new EntityNotFoundException("UE not found id=" + ueID));
-                            ModuleUE md = new ModuleUE();
-                            md.setModule(module);
-                            md.setUe(ue);
-                            return md;
+                        .map(ueId -> {
+                            UE ue = ueRepository.findById(ueId)
+                                    .orElseThrow(() -> new EntityNotFoundException("UE not found id=" + ueId));
+                            ModuleUE moduleUE = new ModuleUE();
+                            moduleUE.setModule(module);
+                            moduleUE.setUe(ue);
+                            return moduleUE;
                         })
                         .toList();
                 module.getModuleUES().addAll(links);
             }
         }
+        // Si dto.getUes() == null => on ne touche pas aux associations existantes
         return module;
     }
+
 
     private ModuleDtoResponse mapUeToDtoWithModule(Module module) {
         ModuleDtoResponse dto = MapperService.mapToDtoResponse(module, ModuleDtoResponse.class);

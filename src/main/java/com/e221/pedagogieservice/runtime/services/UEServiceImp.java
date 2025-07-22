@@ -94,8 +94,10 @@ public class UEServiceImp
 
     @Override
     protected UE updateRelationships(UE ue, UeDtoRequest dto) {
-        if (dto.getMentions() != null) {          // only if caller included the field
+
+        if (dto.getMentions() != null) {  // Champ inclus dans la requête
             ue.getMentionUES().clear();
+
             if (!dto.getMentions().isEmpty()) {
                 List<MentionUE> links = dto.getMentions().stream()
                         .map(mentionId -> {
@@ -110,9 +112,11 @@ public class UEServiceImp
                 ue.getMentionUES().addAll(links);
             }
         }
+        // Si dto.getMentions() == null => on ne touche pas aux mentions existantes
 
         return ue;
     }
+
 
 
 

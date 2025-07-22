@@ -86,28 +86,38 @@ public class ClasseServiceImp extends DefaultServiceImp<Classe, ClasseDtoRequest
     @Override
     protected Classe updateRelationships(Classe classe, ClasseDtoRequest dto) {
 
+        // Niveau
         if (dto.getNiveauId() != null) {
-            Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
-            classe.setNiveau(niveau);
-        } else {
-            classe.setNiveau(null);
+            if (dto.getNiveauId() > 0) {
+                Niveau niveau = DomainEntityHelper.findStrictById(niveauRepository, dto.getNiveauId(), Niveau.class);
+                classe.setNiveau(niveau);
+            } else {
+                classe.setNiveau(null);
+            }
         }
 
+        // Domaine
         if (dto.getDomaineId() != null) {
-            Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, dto.getDomaineId(), Domaine.class);
-            classe.setDomaine(domaine);
-        } else {
-            classe.setDomaine(null);
+            if (dto.getDomaineId() > 0) {
+                Domaine domaine = DomainEntityHelper.findStrictById(domaineRepository, dto.getDomaineId(), Domaine.class);
+                classe.setDomaine(domaine);
+            } else {
+                classe.setDomaine(null);
+            }
         }
 
+        // Specialite
         if (dto.getSpecialiteId() != null) {
-            Specialite specialite = DomainEntityHelper.findStrictById(specialiteRepository, dto.getSpecialiteId(), Specialite.class);
-            classe.setSpecialite(specialite);
-        } else {
-            classe.setSpecialite(null);
+            if (dto.getSpecialiteId() > 0) {
+                Specialite specialite = DomainEntityHelper.findStrictById(specialiteRepository, dto.getSpecialiteId(), Specialite.class);
+                classe.setSpecialite(specialite);
+            } else {
+                classe.setSpecialite(null);
+            }
         }
 
         return classe;
     }
+
 }
 
