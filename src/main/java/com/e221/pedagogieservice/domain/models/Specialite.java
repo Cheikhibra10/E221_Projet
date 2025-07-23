@@ -18,7 +18,8 @@ public class Specialite implements GenericEntity<Specialite> {
     private Long id;
     private String libelle;
     @Enumerated(EnumType.STRING)
-    private Statut statut;
+    @Column(nullable = false)
+    private Statut statut = Statut.Actif;
     @Column(columnDefinition = "boolean default false")
     @Schema(description = "Archivé ou non", defaultValue = "false", example = "false")
     private boolean archive;
