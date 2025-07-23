@@ -13,7 +13,7 @@ public class Cycle implements GenericEntity<Cycle> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String cycle;
-    private String duree;
+    private int duree;
     private int taux_horaire;
     @Enumerated(EnumType.STRING)
     private Statut statut;

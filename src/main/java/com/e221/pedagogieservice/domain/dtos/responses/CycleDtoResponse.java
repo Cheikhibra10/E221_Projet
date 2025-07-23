@@ -11,7 +11,7 @@ import lombok.*;
 public class CycleDtoResponse {
     private Long id;
     private String cycle;
-    private String duree;
+    private int duree;
     private int taux_horaire;
     private Statut statut;
     private boolean archive;
