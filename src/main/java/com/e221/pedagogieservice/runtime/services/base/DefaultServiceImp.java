@@ -9,6 +9,7 @@ import com.cheikh.commun.exceptions.InternalServerErrorException;
 import com.cheikh.commun.services.MapperService;
 import com.cheikh.commun.services.base.DefaultService;
 import com.e221.pedagogieservice.domain.constants.ErrorsMessages;
+import com.e221.pedagogieservice.domain.models.Statut;
 import com.e221.pedagogieservice.domain.utils.LoggingUtil;
 import com.e221.pedagogieservice.runtime.config.CacheNameProvider;
 import com.e221.pedagogieservice.runtime.specifications.DefaultSpecification;
@@ -80,6 +81,18 @@ public abstract class DefaultServiceImp<T extends GenericEntity<T>, D, R>
                     "create",
                     "beginning add new < %s >".formatted(tClass.getSimpleName()));
 
+            // ---- Forcer statut = Actif si le DTO a un champ 'statut' ----
+            try {
+                Field statutField = d.getClass().getDeclaredField("statut");
+                statutField.setAccessible(true);
+                Object statutValue = statutField.get(d);
+                if (statutValue == null) {
+                    statutField.set(d, Statut.Actif);
+                }
+            } catch (NoSuchFieldException ignored) {
+                // pas de champ 'statut', on ignore
+            }
+
             // ---- Dynamic uniqueness guard (libelle / code if present) ----
             Map<String, Object> uniqueFields = new HashMap<>();
 
@@ -133,6 +146,7 @@ public abstract class DefaultServiceImp<T extends GenericEntity<T>, D, R>
                     .formatted(ErrorsMessages.ADD_ENTITY_ERROR, tClass.getName()));
         }
     }
+
 
     /* =========================================================
      * UPDATE (returns fully hydrated DTO)
