@@ -119,7 +119,7 @@ public abstract class DefaultServiceImp<T extends GenericEntity<T>, D, R>
                 });
                 if (exists) {
                     throw new BadRequestException(
-                            "%s with the same business key(s) already exists"
+                            "%s avec le meme attribut existe déja"
                                     .formatted(tClass.getSimpleName()));
                 }
             }
@@ -134,7 +134,7 @@ public abstract class DefaultServiceImp<T extends GenericEntity<T>, D, R>
             R dto = mapToDto(full);
 
             refreshCaches(savedEntity.getId(), dto);
-            log.info("✅ Created {}", dto);
+            log.info("Created {}", dto);
             return dto;
 
         } catch (DataIntegrityViolationException ex) {
