@@ -17,5 +17,6 @@ import java.util.List;
 public class DocumentDtoRequest {
     private String libelle;
     private Statut statut;
+    private TypeDocument typeDocument;
     private List<Long> niveaux;
 }

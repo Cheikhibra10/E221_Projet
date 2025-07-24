@@ -20,8 +20,8 @@ public class Calendrier implements GenericEntity<Calendrier> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Date dateDebut;
-    private Date dateFin;
+    private LocalDate dateDebut;
+    private LocalDate dateFin;
     @Enumerated(EnumType.STRING)
     private Statut statut;
     @Column(columnDefinition = "boolean default false")

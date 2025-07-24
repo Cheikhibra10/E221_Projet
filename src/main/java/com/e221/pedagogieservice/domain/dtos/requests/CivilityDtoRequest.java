@@ -11,9 +11,7 @@ import lombok.*;
 @Builder
 public class CivilityDtoRequest {
 
-    private Long id;
     private String libelle;
     private Statut statut;
-    private boolean archive;
 
 }

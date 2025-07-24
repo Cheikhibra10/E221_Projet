@@ -4,13 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum TypeDocument {
-    A_ramener("À ramener"),
-    A_retirer("À retirer");
-
-    private final String label;
-
-    TypeDocument(String label) {
-        this.label = label;
-    }
-
+    A_ramener,
+    A_retirer
 }

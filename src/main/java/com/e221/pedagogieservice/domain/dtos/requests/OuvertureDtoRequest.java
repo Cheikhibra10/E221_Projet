@@ -21,11 +21,11 @@ public class OuvertureDtoRequest {
     private Statut statut;
 
     @NotNull(message = "La date de début est obligatoire.")
-    @PastOrPresent(message = "La date de début ne peut pas être dans le futur.")
+    @FutureOrPresent(message = "La date de début ne peut pas être dans le futur.")
     private LocalDate dateDebut;
 
     @NotNull(message = "La date de fin est obligatoire.")
-    @FutureOrPresent(message = "La date de fin doit être aujourd’hui ou dans le futur.")
+    @Future(message = "La date de fin doit être aujourd’hui ou dans le futur.")
     private LocalDate dateFin;
     @NotNull(message = "L'année scolaire est obligatoire.")
     private Long anneeScolaireId;

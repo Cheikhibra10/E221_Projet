@@ -10,6 +10,5 @@ public enum Statut {
     Indisponible,
     Disponible,
     En_attente,
-    A_ramener,
-    A_retirer
+
 }
