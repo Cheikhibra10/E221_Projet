@@ -5,8 +5,10 @@ import com.e221.pedagogieservice.domain.dtos.requests.SousClasseDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.responses.SousClasseDtoResponse;
 import com.e221.pedagogieservice.domain.models.Classe;
 import com.e221.pedagogieservice.domain.models.Niveau;
+import com.e221.pedagogieservice.domain.models.Semestre;
 import com.e221.pedagogieservice.domain.models.SousClasse;
 import com.e221.pedagogieservice.domain.repositories.ClasseRepository;
+import com.e221.pedagogieservice.domain.repositories.SemestreRepository;
 import com.e221.pedagogieservice.domain.repositories.SousClasseRepository;
 import com.e221.pedagogieservice.domain.services.SousClasseService;
 import com.e221.pedagogieservice.domain.utils.DomainEntityHelper;
@@ -30,17 +32,19 @@ public class SousClasseServiceImp
 
     private final SousClasseRepository repository;
     private final ClasseRepository classeRepository;
+    private final SemestreRepository semestreRepository;
     private final EntityManager entityManager;
 
     public SousClasseServiceImp(
             SousClasseRepository repository,
             DefaultSpecification<SousClasse> defaultSpecification,
             CacheNameProvider cacheNameProvider,
-            CacheManager entityManager, ClasseRepository classeRepository, EntityManager entityManager1
+            CacheManager entityManager, ClasseRepository classeRepository, SemestreRepository semestreRepository, EntityManager entityManager1
     ) {
         super(repository, defaultSpecification, cacheNameProvider, entityManager);
         this.repository = repository;
         this.classeRepository = classeRepository;
+        this.semestreRepository = semestreRepository;
         this.entityManager = entityManager1;
     }
 
@@ -51,6 +55,11 @@ public class SousClasseServiceImp
             sousClasse.setClasse(classe);
         } else {
             sousClasse.setClasse(null);
+        } if (dto.getSemestreId() != null) {
+            Semestre semestre = DomainEntityHelper.findStrictById(semestreRepository, dto.getSemestreId(), Semestre.class);
+            sousClasse.setSemestre(semestre);
+        } else {
+            sousClasse.setSemestre(null);
         }
         return sousClasse;
     }
@@ -63,6 +72,15 @@ public class SousClasseServiceImp
                 sousClasse.setClasse(classe);
             } else {
                 sousClasse.setClasse(null);
+            }
+
+        }
+        if (dto.getSemestreId() != null) {
+            if(dto.getSemestreId() > 0){
+                Semestre semestre = DomainEntityHelper.findStrictById(semestreRepository, dto.getSemestreId(), Semestre.class);
+                sousClasse.setSemestre(semestre);
+            } else {
+                sousClasse.setSemestre(null);
             }
 
         }

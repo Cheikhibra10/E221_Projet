@@ -12,7 +12,7 @@ import lombok.*;
 public class SemestreDtoResponse {
     private Long id;
     private String libelle;
-    private String duree;
+    private int duree;
     private Statut statut;
     private Boolean archive;
     private NiveauDtoResponse niveau;

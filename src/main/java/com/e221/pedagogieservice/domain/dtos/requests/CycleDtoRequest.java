@@ -13,7 +13,6 @@ import lombok.*;
 @Builder
 public class CycleDtoRequest {
 
-    private Long id;
 
     @NotBlank(message = "Le nom du cycle est obligatoire.")
     @Size(min = 2, max = 100, message = "Le nom du cycle doit contenir entre 2 et 100 caractères.")
@@ -21,7 +20,5 @@ public class CycleDtoRequest {
     private int duree;
     private int taux_horaire;
     private Statut statut;
-    private boolean archive;
-
 
 }

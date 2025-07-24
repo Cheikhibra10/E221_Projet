@@ -25,8 +25,6 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.criteria.Predicate;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -76,60 +74,22 @@ public abstract class DefaultServiceImp<T extends GenericEntity<T>, D, R>
     @Override
     public R create(D d) {
         try {
-            LoggingUtil.logInfo(
-                    this.getClass(),
-                    "create",
+            LoggingUtil.logInfo(this.getClass(), "create",
                     "beginning add new < %s >".formatted(tClass.getSimpleName()));
 
-            // ---- Forcer statut = Actif si le DTO a un champ 'statut' ----
-            try {
-                Field statutField = d.getClass().getDeclaredField("statut");
-                statutField.setAccessible(true);
-                Object statutValue = statutField.get(d);
-                if (statutValue == null) {
-                    statutField.set(d, Statut.Actif);
-                }
-            } catch (NoSuchFieldException ignored) {
-                // pas de champ 'statut', on ignore
-            }
+            // ---- Vérification unicité dynamique (libelle / code si présents) ----
+            checkUniqueFields(d);
 
-            // ---- Dynamic uniqueness guard (libelle / code if present) ----
-            Map<String, Object> uniqueFields = new HashMap<>();
-
-            try {
-                Field libelleField = d.getClass().getDeclaredField("libelle");
-                libelleField.setAccessible(true);
-                Object value = libelleField.get(d);
-                if (value != null) uniqueFields.put("libelle", value);
-            } catch (NoSuchFieldException ignored) {}
-
-            try {
-                Field codeField = d.getClass().getDeclaredField("code");
-                codeField.setAccessible(true);
-                Object value = codeField.get(d);
-                if (value != null) uniqueFields.put("code", value);
-            } catch (NoSuchFieldException ignored) {}
-
-            if (!uniqueFields.isEmpty()) {
-                boolean exists = repository.exists((root, query, cb) -> {
-                    List<Predicate> preds = new ArrayList<>();
-                    uniqueFields.forEach((name, val) ->
-                            preds.add(cb.equal(root.get(name), val)));
-                    return cb.or(preds.toArray(new Predicate[0]));
-                });
-                if (exists) {
-                    throw new BadRequestException(
-                            "%s avec le meme attribut existe déja"
-                                    .formatted(tClass.getSimpleName()));
-                }
-            }
-
-            // ---- Persist ----
+            // ---- Mapping DTO -> Entité ----
             T entity = MapperService.mapToEntity(d, tClass);
+
+            // ---- Gestion des relations ----
             entity = createRelationships(entity, d);
+
+            // ---- Sauvegarde ----
             T savedEntity = repository.save(entity);
 
-            // ---- Reload fully + map ----
+            // ---- Reload complet + mapping ----
             T full = reloadWithRelationships(savedEntity.getId());
             R dto = mapToDto(full);
 
@@ -137,15 +97,92 @@ public abstract class DefaultServiceImp<T extends GenericEntity<T>, D, R>
             log.info("Created {}", dto);
             return dto;
 
-        } catch (DataIntegrityViolationException ex) {
-            throw new BadRequestException("%s %s"
-                    .formatted(tClass.getSimpleName(), ErrorsMessages.ENTITY_EXISTS));
         } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-            throw new InternalServerErrorException("%s %s"
-                    .formatted(ErrorsMessages.ADD_ENTITY_ERROR, tClass.getName()));
+            // Centralisation de la gestion des erreurs
+            handleException(ex);
+            return null; // Jamais atteint car handleException lance toujours une exception
         }
     }
+
+    /**
+     * Vérifie l'unicité des champs "libelle" et "code" si présents.
+     */
+    private void checkUniqueFields(D d) throws IllegalAccessException {
+
+        // ---- Forcer statut = Actif si le DTO a un champ 'statut' ----
+        try {
+            Field statutField = d.getClass().getDeclaredField("statut");
+            statutField.setAccessible(true);
+            Object statutValue = statutField.get(d);
+            if (statutValue == null) {
+                statutField.set(d, Statut.Actif);
+            }
+        } catch (NoSuchFieldException ignored) {
+            // pas de champ 'statut', on ignore
+        }
+        try {
+            Field archiveField = d.getClass().getDeclaredField("archive");
+            archiveField.setAccessible(true);
+            Object archiveValue = archiveField.get(d);
+
+            // Si null et type compatible, on force à false
+            if (archiveValue == null) {
+                if (archiveField.getType() == Boolean.class || archiveField.getType() == boolean.class) {
+                    archiveField.set(d, false);
+                }
+            }
+        } catch (NoSuchFieldException ignored) {
+            // Pas de champ 'archive', on ignore
+        }
+
+        Map<String, Object> uniqueFields = new HashMap<>();
+
+        try {
+            Field libelleField = d.getClass().getDeclaredField("libelle");
+            libelleField.setAccessible(true);
+            Object value = libelleField.get(d);
+            if (value != null) uniqueFields.put("libelle", value);
+        } catch (NoSuchFieldException ignored) {}
+
+        try {
+            Field codeField = d.getClass().getDeclaredField("code");
+            codeField.setAccessible(true);
+            Object value = codeField.get(d);
+            if (value != null) uniqueFields.put("code", value);
+        } catch (NoSuchFieldException ignored) {}
+
+        if (!uniqueFields.isEmpty()) {
+            boolean exists = repository.exists((root, query, cb) -> {
+                List<Predicate> preds = new ArrayList<>();
+                uniqueFields.forEach((name, val) -> preds.add(cb.equal(root.get(name), val)));
+                return cb.or(preds.toArray(new Predicate[0]));
+            });
+            if (exists) {
+                throw new BadRequestException(
+                        "%s avec le meme attribut existe déja"
+                                .formatted(tClass.getSimpleName()));
+            }
+        }
+    }
+
+    /**
+     * Gère toutes les exceptions pour centraliser les réponses appropriées.
+     */
+    private void handleException(Exception ex) {
+        if (ex instanceof BadRequestException || ex instanceof EntityNotFoundException) {
+            throw (RuntimeException) ex; // Laisse passer les exceptions métier
+        }
+
+        if (ex instanceof DataIntegrityViolationException) {
+            throw new BadRequestException("%s %s"
+                    .formatted(tClass.getSimpleName(), ErrorsMessages.ENTITY_EXISTS));
+        }
+
+        log.error(ex.getMessage(), ex);
+        throw new InternalServerErrorException("%s %s"
+                .formatted(ErrorsMessages.ADD_ENTITY_ERROR, tClass.getName()));
+    }
+
 
 
     /* =========================================================
@@ -185,6 +222,11 @@ public abstract class DefaultServiceImp<T extends GenericEntity<T>, D, R>
                     "begin update < %s > with id: %s"
                             .formatted(tClass.getSimpleName(), id));
 
+            // Forcer les valeurs par défaut
+            setDefaultValue(d, "statut", Statut.Actif);
+            setDefaultValue(d, "archive", false);
+
+            // Mise à jour de l'entité
             MapperService.patchEntityFromDto(entity, d);
             entity = updateRelationships(entity, d);
             T saved = repository.save(entity);
@@ -195,6 +237,7 @@ public abstract class DefaultServiceImp<T extends GenericEntity<T>, D, R>
                     "< %s > updated successfully".formatted(tClass.getSimpleName()));
 
             return saved;
+
         } catch (DataIntegrityViolationException ex) {
             throw new BadRequestException("%s %s"
                     .formatted(tClass.getName(), ErrorsMessages.ENTITY_EXISTS));
@@ -203,6 +246,22 @@ public abstract class DefaultServiceImp<T extends GenericEntity<T>, D, R>
                     .formatted(ErrorsMessages.ADD_ENTITY_ERROR, tClass.getName()));
         }
     }
+
+    private void setDefaultValue(D dto, String fieldName, Object defaultValue) {
+        try {
+            Field field = dto.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            Object value = field.get(dto);
+            if (value == null) {
+                field.set(dto, defaultValue);
+            }
+        } catch (NoSuchFieldException ignored) {
+            // Pas de champ, on ignore
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Unable to set default value for field: " + fieldName, e);
+        }
+    }
+
 
     /* =========================================================
      * FIND ALL (cached, non-archived default)

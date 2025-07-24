@@ -14,14 +14,9 @@ import java.util.List;
 @Setter
 @Builder
 public class SpecialiteDtoRequest {
-
-    private Long id;
-
     @NotBlank(message = "Le libellé est obligatoire.")
     @Size(min = 2, max = 100, message = "Le libellé doit contenir entre 2 et 100 caractères.")
     private String libelle;
-    private Statut statut;
-    private boolean archive;
     private Long mentionId;
     private Long domaineId;
     private List<Long> niveaux;

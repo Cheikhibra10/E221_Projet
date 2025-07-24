@@ -11,14 +11,7 @@ import lombok.*;
 @Setter
 @Builder
 public class DomaineDtoRequest {
-
-    private Long id;
-
     @NotBlank(message = "Le libellé du domaine est obligatoire.")
     @Size(min = 2, max = 100, message = "Le libellé du domaine doit contenir entre 2 et 100 caractères.")
     private String libelle;
-    private boolean etat = true;
-    private boolean archive;
-
-
 }

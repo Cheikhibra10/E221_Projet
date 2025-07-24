@@ -15,10 +15,7 @@ import java.util.List;
 @Setter
 @Builder
 public class DocumentDtoRequest {
-    private Long id;
     private String libelle;
     private Statut statut;
-    private TypeDocument typeDocument;
-    private boolean archive;
     private List<Long> niveaux;
 }

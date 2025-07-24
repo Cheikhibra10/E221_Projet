@@ -15,10 +15,6 @@ import java.util.List;
 @Setter
 @Builder
 public class CalendrierDtoRequest {
-
-    private Long id; // non validé ici
-
-
     @NotNull(message = "La date de début est obligatoire.")
     @FutureOrPresent(message = "La date de début doit être dans le présent ou le futur.")
     private LocalDate dateDebut;
@@ -26,7 +22,6 @@ public class CalendrierDtoRequest {
     @Future(message = "La date de fin doit être dans le futur.")
     private LocalDate dateFin;
     private Statut statut;
-    private boolean archive;
     @NotNull(message = "Le niveau est obligatoire.")
     private Long niveauId;
     @NotNull(message = "Le semestre est obligatoire.")

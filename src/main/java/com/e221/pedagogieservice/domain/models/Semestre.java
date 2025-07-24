@@ -13,7 +13,7 @@ public class Semestre implements GenericEntity<Semestre> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String libelle;
-    private String duree;
+    private int duree;
     @Enumerated(EnumType.STRING)
     private Statut statut;
     @Column(columnDefinition = "boolean default false")

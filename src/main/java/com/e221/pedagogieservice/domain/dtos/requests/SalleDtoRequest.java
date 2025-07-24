@@ -10,11 +10,9 @@ import lombok.*;
 @Setter
 @Builder
 public class SalleDtoRequest {
-    private Long id;
     private String numero;
     private String libelle;
     private int nbrPlace;
     private Statut statut;
-    private boolean archive;
 
 }

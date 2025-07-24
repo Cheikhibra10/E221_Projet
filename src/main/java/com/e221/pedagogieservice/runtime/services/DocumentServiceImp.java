@@ -1,27 +1,19 @@
 package com.e221.pedagogieservice.runtime.services;
 
-import com.cheikh.commun.core.PageResponse;
 import com.cheikh.commun.exceptions.EntityNotFoundException;
 import com.cheikh.commun.services.MapperService;
 import com.e221.pedagogieservice.domain.dtos.requests.DocumentDtoRequest;
-import com.e221.pedagogieservice.domain.dtos.requests.ModuleDtoRequest;
 import com.e221.pedagogieservice.domain.dtos.responses.*;
 import com.e221.pedagogieservice.domain.models.*;
-import com.e221.pedagogieservice.domain.models.Module;
 import com.e221.pedagogieservice.domain.repositories.DocumentRepository;
-import com.e221.pedagogieservice.domain.repositories.ModuleRepository;
 import com.e221.pedagogieservice.domain.repositories.NiveauRepository;
-import com.e221.pedagogieservice.domain.repositories.UeRepository;
 import com.e221.pedagogieservice.domain.services.DocumentService;
-import com.e221.pedagogieservice.domain.services.ModuleService;
-import com.e221.pedagogieservice.domain.utils.DomainEntityHelper;
 import com.e221.pedagogieservice.runtime.config.CacheNameProvider;
 import com.e221.pedagogieservice.runtime.services.base.DefaultServiceImp;
 import com.e221.pedagogieservice.runtime.specifications.DefaultSpecification;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;

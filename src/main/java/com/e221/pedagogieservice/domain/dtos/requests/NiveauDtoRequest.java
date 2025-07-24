@@ -12,13 +12,10 @@ import lombok.*;
 @Builder
 public class NiveauDtoRequest {
 
-    private Long id;
-
     @NotBlank(message = "Le libellé du niveau est obligatoire.")
     @Size(min = 2, max = 50, message = "Le libellé doit contenir entre 2 et 50 caractères.")
     private String libelle;
     private Statut statut;
-    private boolean archive;
     @NotNull(message = "Le cycle est obligatoire.")
     private Long cycleId;
 }

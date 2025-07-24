@@ -15,8 +15,6 @@ import java.time.LocalDate;
 @Builder
 public class EvenementDtoRequest {
 
-    private Long id;
-
     @NotBlank(message = "Le libellé est obligatoire.")
     @Size(min = 2, max = 100, message = "Le libellé doit contenir entre 2 et 100 caractères.")
     private String libelle;

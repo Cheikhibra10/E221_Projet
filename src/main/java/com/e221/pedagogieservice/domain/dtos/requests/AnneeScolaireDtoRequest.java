@@ -12,14 +12,10 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class AnneeScolaireDtoRequest {
-    private Long id;
     @NotBlank(message = "Le libellé est obligatoire.")
     @Size(min = 3, max = 100, message = "Le libellé doit contenir entre 3 et 100 caractères.")
     private String libelle;
     private LocalDate dateOuverture;
     private LocalDate dateFermeture;
     private Statut statut;
-    private boolean archive;
-
-
 }

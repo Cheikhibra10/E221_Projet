@@ -12,14 +12,10 @@ import lombok.*;
 @Setter
 @Builder
 public class SousClasseDtoRequest {
-
-    private Long id;
-
     @NotBlank(message = "Le libellé est obligatoire.")
     @Size(min = 2, max = 100, message = "Le libellé doit contenir entre 2 et 100 caractères.")
     private String libelle;
     private Statut statut;
-    private boolean archive;
     @NotNull(message = "La classe est obligatoire.")
     private Long classeId;
     private Long semestreId;

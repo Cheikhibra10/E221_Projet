@@ -122,9 +122,7 @@ public class    SpecialiteServiceImp
      * ------------------------------------------------------------------ */
     @Override
     protected Specialite createRelationships(Specialite specialite, SpecialiteDtoRequest dto) {
-        if (dto.getStatut() == null) {
-            dto.setStatut(Statut.Actif);
-        }
+
         // Mention
         if (dto.getMentionId() != null) {
             Mention mention = DomainEntityHelper.findStrictById(mentionRepository, dto.getMentionId(), Mention.class);
@@ -164,9 +162,7 @@ public class    SpecialiteServiceImp
      * ------------------------------------------------------------------ */
     @Override
     protected Specialite updateRelationships(Specialite specialite, SpecialiteDtoRequest dto) {
-        if (dto.getStatut() == null) {
-            dto.setStatut(Statut.Actif);
-        }
+
         // ----- Mention -----
         if (dto.getMentionId() != null) {                 // champ présent dans la requête
             if (dto.getMentionId() > 0) {

@@ -8,6 +8,5 @@ import lombok.*;
 @Setter
 @Builder
 public class TypeUeDtoRequest {
-    private Long id;
     private String code;
 }

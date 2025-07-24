@@ -14,9 +14,6 @@ import java.util.Date;
 @Setter
 @Builder
 public class OuvertureDtoRequest {
-
-    private Long id;
-
     @NotBlank(message = "Le libellé est obligatoire.")
     @Size(min = 3, max = 50, message = "Le libellé doit contenir entre 3 et 50 caractères.")
     private String libelle;
@@ -30,7 +27,6 @@ public class OuvertureDtoRequest {
     @NotNull(message = "La date de fin est obligatoire.")
     @FutureOrPresent(message = "La date de fin doit être aujourd’hui ou dans le futur.")
     private LocalDate dateFin;
-    private boolean archive;
     @NotNull(message = "L'année scolaire est obligatoire.")
     private Long anneeScolaireId;
 }
