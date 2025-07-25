@@ -33,10 +33,6 @@ public class EvenementCalendrier implements GenericEntity<EvenementCalendrier> {
     @JoinColumn(name = "evenement_id", nullable = false)
     private Evenement evenement;
 
-    @ManyToOne
-    @JoinColumn(name = "semestre_id", nullable = false)
-    private Semestre semestre;
-
     @Override
     public EvenementCalendrier createNewInstance() {
         return new EvenementCalendrier();
