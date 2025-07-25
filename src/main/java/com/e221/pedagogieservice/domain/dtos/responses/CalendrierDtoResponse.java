@@ -22,8 +22,8 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CalendrierDtoResponse {
     private Long id;
-    private Date dateDebut;
-    private Date dateFin;
+    private LocalDate dateDebut;
+    private LocalDate dateFin;
     private Statut statut;
     private boolean archive;
     private NiveauDtoResponse niveau;

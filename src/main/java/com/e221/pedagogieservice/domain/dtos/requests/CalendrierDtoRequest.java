@@ -16,10 +16,10 @@ import java.util.List;
 @Builder
 public class CalendrierDtoRequest {
     @NotNull(message = "La date de début est obligatoire.")
-    @FutureOrPresent(message = "La date de début doit être dans le présent ou le futur.")
+    @FutureOrPresent(message = "La date de debut doit être dans le présent ou le futur.")
     private LocalDate dateDebut;
     @NotNull(message = "La date de fin est obligatoire.")
-    @Future(message = "La date de fin doit être dans le futur.")
+    @FutureOrPresent(message = "La date de fin doit être dans le présent ou le futur.")
     private LocalDate dateFin;
     private Statut statut;
     @NotNull(message = "Le niveau est obligatoire.")
