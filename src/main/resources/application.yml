@@ -115,5 +115,3 @@ logging:
     com.e221.pedagogieservice.runtime.config.CacheNameProvider: INFO
     org.springframework.data.redis.cache: DEBUG
     org.springframework.web.client.RestTemplate: DEBUG
-    org.springframework.http.client: DEBUG
-    com.com.e221.pedagogieservice.runtime.services.AuthService: DEBUG
