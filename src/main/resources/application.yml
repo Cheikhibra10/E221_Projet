@@ -70,6 +70,18 @@ spring:
   config:
     import: optional:configserver:http://localhost:8888
 
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://keycloak-on-render-lh67.onrender.com/realms/ecole221-projet
+
+keycloak:
+  realm: ecole221-projet
+  auth-server-url: https://keycloak-on-render-lh67.onrender.com
+  resource: e221-api
+
 springdoc:
   api-docs:
     enabled: true
@@ -102,3 +114,6 @@ logging:
   level:
     com.e221.pedagogieservice.runtime.config.CacheNameProvider: INFO
     org.springframework.data.redis.cache: DEBUG
+    org.springframework.web.client.RestTemplate: DEBUG
+    org.springframework.http.client: DEBUG
+    com.com.e221.pedagogieservice.runtime.services.AuthService: DEBUG
