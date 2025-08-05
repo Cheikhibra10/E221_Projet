@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(
                                         "/auth/**",
-                                        "/http://localhost:8086/auth/login",
+                                        "/http://localhost:8086/api/v1/auth/login",
                                         "/v2/api-docs",
                                         "/v3/api-docs",
                                         "/v3/api-docs/**",
