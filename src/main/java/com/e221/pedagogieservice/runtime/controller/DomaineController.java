@@ -52,7 +52,7 @@ public class DomaineController extends GenericCrudController<
     }
 
     @Override
-    @PreAuthorize("hasRole('client_user')")
+    @PreAuthorize("hasRole('client_admin')")
     @GetMapping
     public ResponseEntity<PageResponse<DomaineDtoResponse>> findAll(
             @RequestParam(defaultValue = "0") int page,
