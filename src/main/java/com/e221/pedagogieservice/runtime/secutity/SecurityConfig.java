@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(
                                         "/auth/**",
-                                        "/https://e221-projet.onrender.com/api/v1/auth/login",
+                                        "/api/v1/auth/login",
                                         "/v2/api-docs",
                                         "/v3/api-docs",
                                         "/v3/api-docs/**",
