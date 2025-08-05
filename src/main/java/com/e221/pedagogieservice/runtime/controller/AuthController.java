@@ -1,5 +1,6 @@
 package com.e221.pedagogieservice.runtime.controller;
 
+import com.e221.pedagogieservice.domain.annotation.apiversionning.E221ApiVersion;
 import com.e221.pedagogieservice.domain.dtos.requests.LoginRequest;
 import com.e221.pedagogieservice.domain.dtos.responses.LoginResponse;
 import com.e221.pedagogieservice.runtime.services.AuthService;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@E221ApiVersion
 @RequestMapping("/auth")
 @Tag(name = "Authentication", description = "Gestion des authentifications")
 public class AuthController {
