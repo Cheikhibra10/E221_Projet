@@ -20,7 +20,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request.getUsername(), request.getPassword());
+        LoginResponse response = authService.login(request.getEmail(), request.getPassword());
         return ResponseEntity.ok(response);
     }
 }
