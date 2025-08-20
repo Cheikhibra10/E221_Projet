@@ -45,7 +45,6 @@ public class SecurityConfig {
                 .oauth2ResourceServer(auth ->
                         auth.jwt(token -> token.jwtAuthenticationConverter(new KeycloakJwtAuthenticationConverter())));
 
-
         return http.build();
     }
 }
