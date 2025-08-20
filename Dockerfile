@@ -12,12 +12,11 @@ COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 COPY src/ ./src/
 
-# Create settings.xml with GitHub token expanded
+# Create Maven settings.xml using printf to handle special characters safely
 RUN mkdir -p /root/.m2 && \
-    echo "<settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>github</id><username>Cheikhibra10</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" \
-    > /root/.m2/settings.xml
+    printf '<settings>\n  <servers>\n    <server>\n      <id>github</id>\n      <username>Cheikhibra10</username>\n      <password>%s</password>\n    </server>\n  </servers>\n</settings>\n' "$GITHUB_TOKEN" > /root/.m2/settings.xml
 
-# Make wrapper executable and build
+# Make Maven wrapper executable and build the project
 RUN chmod +x mvnw && ./mvnw clean package -DskipTests --settings /root/.m2/settings.xml
 
 # -------- Run Stage --------
@@ -25,7 +24,7 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-# Copy jar from builder
+# Copy the jar from the builder stage
 COPY --from=builder /app/target/*.jar app.jar
 
 # Expose Spring Boot default port
